@@ -1,0 +1,195 @@
+body {
+    background-color: #e9ebee;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.fb-header {
+    width: 100%;
+    background: #1877f2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: 56px;
+}
+
+.fb-header-content {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 16px;
+}
+
+.fb-logo {
+    color: #fff;
+    font-size: 1.7em;
+    font-weight: bold;
+    margin-right: 32px;
+    letter-spacing: 1px;
+}
+
+.fb-auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+    .fb-auth input[type="text"],
+    .fb-auth input[type="password"] {
+        width: 120px;
+        margin-bottom: 0;
+        padding: 6px 8px;
+        border-radius: 4px;
+        border: 1px solid #ccd0d5;
+        font-size: 1em;
+    }
+
+    .fb-auth button,
+    #logoutBtn {
+        background: #42b72a;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 14px;
+        font-weight: 600;
+        margin-left: 4px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .fb-auth button:hover,
+        #logoutBtn:hover {
+            background: #36a420;
+        }
+
+#logoutBtn {
+    margin-left: 16px;
+    display: inline-block;
+}
+
+.fb-user {
+    color: #fff;
+    margin-left: 16px;
+    font-weight: 500;
+    font-size: 1em;
+}
+
+.container {
+    max-width: 600px;
+    margin: 32px auto 0 auto;
+    background: #fff;
+    padding: 24px 20px 32px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid #dddfe2;
+}
+
+h1, h2 {
+    color: #1877f2;
+    font-weight: 600;
+    margin-top: 0;
+}
+
+form textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1em;
+    resize: vertical;
+}
+
+form input[type="file"] {
+    margin-bottom: 10px;
+}
+
+form button,
+.post .actions button {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    margin-left: 4px;
+    font-weight: 500;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+    form button:hover,
+    .post .actions button:hover {
+        background: #145db2;
+    }
+
+input[type="text"], input[type="password"], textarea {
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+a {
+    color: #1877f2;
+    text-decoration: none;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+.post {
+    background: #f7f8fa;
+    border: 1px solid #ccd0d5;
+    border-radius: 8px;
+    margin: 16px 0;
+    padding: 16px;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+    .post img {
+        max-width: 100%;
+        margin-top: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccd0d5;
+    }
+
+    .post .actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .post .timestamp {
+        font-size: 0.8em;
+        color: #65676b;
+    }
+
+.post-user {
+    font-size: 0.9em;
+    color: #555;
+    margin-top: 8px;
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+    .top-bar .welcome-msg {
+        margin: 0;
+        font-size: 2em;
+    }

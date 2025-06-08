@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MiniPost - Listings</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .listing-card {
+            background: #fff;
+            border: 1px solid #ccd0d5;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            margin: 16px 0;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+            .listing-card img {
+                max-width: 180px;
+                border-radius: 6px;
+                border: 1px solid #ccd0d5;
+            }
+
+        .listing-details {
+            flex: 1;
+        }
+
+        .listing-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #1877f2;
+            margin-bottom: 4px;
+        }
+
+        .listing-meta {
+            color: #555;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .listing-price {
+            color: #42b72a;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .listing-description {
+            margin-bottom: 8px;
+        }
+
+        .listing-type {
+            display: inline-block;
+            background: #e9ebee;
+            color: #1877f2;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 700px) {
+            .listing-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+                .listing-card img {
+                    max-width: 100%;
+                }
+        }
+    </style>
+</head>
+<body>
+    <header class="fb-header">
+        <div class="fb-header-content" style="display: flex; align-items: center;">
+            <span class="fb-logo">MiniPost</span>
+            <a href="listing.html" id="addListingLink" style="margin-left:16px; color:#fff; text-decoration:none; font-weight:bold; display:none;">Add Listing</a>
+            <a href="mylistings.html" id="myListingsLink" style="margin-left:16px; color:#fff; text-decoration:none; font-weight:bold; display:none;">My Listings</a>
+            <form id="loginForm" class="fb-auth" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                <input type="text" id="username" placeholder="Username" required />
+                <input type="password" id="password" placeholder="Password" required />
+                <button type="submit" id="loginBtn">Login</button>
+                <button type="button" id="registerBtn">Register</button>
+            </form>
+            <span id="displayUser" class="fb-user" style="margin-left: 24px;"></span>
+            <a href="master.html" id="masterPageBtn" style="display:none; margin-left:16px; background:#fff; color:#1877f2; font-weight:bold; border-radius:4px; padding:6px 14px; text-decoration:none;">Master Page</a>
+            <div style="flex:1"></div>
+            <button id="logoutBtn" style="display:none; margin-left:auto;">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <hr />
+        <div id="appSection">
+            <h2>All Listings</h2>
+            <div style="display:flex; gap:12px; margin-bottom:16px;">
+                <select id="filterType" style="max-width:160px;">
+                    <option value="">All Types</option>
+                    <option value="Car">Car</option>
+                    <option value="House">House</option>
+                </select>
+                <input type="number" id="filterMinPrice" placeholder="Min Price" style="max-width:120px;">
+                <input type="number" id="filterMaxPrice" placeholder="Max Price" style="max-width:120px;">
+                <input type="text" id="searchInput" placeholder="Search listings..." style="flex:1;">
+            </div>
+            <div id="listingsContainer"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

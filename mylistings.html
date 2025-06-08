@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Listings - MiniPost</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .edit-section {
+            margin-top: 8px;
+        }
+
+            .edit-section input, .edit-section textarea {
+                width: 100%;
+                margin-bottom: 8px;
+            }
+
+        .listing-card {
+            background: #fff;
+            border: 1px solid #ccd0d5;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            margin: 16px 0;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+            .listing-card img {
+                max-width: 180px;
+                border-radius: 6px;
+                border: 1px solid #ccd0d5;
+            }
+
+        .listing-details {
+            flex: 1;
+        }
+
+        .listing-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #1877f2;
+            margin-bottom: 4px;
+        }
+
+        .listing-meta {
+            color: #555;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .listing-price {
+            color: #42b72a;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .listing-description {
+            margin-bottom: 8px;
+        }
+
+        .listing-type {
+            display: inline-block;
+            background: #e9ebee;
+            color: #1877f2;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 700px) {
+            .listing-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+                .listing-card img {
+                    max-width: 100%;
+                }
+        }
+    </style>
+</head>
+<body>
+    <header class="fb-header">
+        <div class="fb-header-content" style="display: flex; align-items: center;">
+            <span class="fb-logo">MiniPost</span>
+            <a href="index.html" style="margin-left:16px; color:#fff; text-decoration:none; font-weight:bold;">All Listings</a>
+            <span id="displayUser" class="fb-user" style="margin-left: 24px;"></span>
+            <div style="flex:1"></div>
+            <button id="logoutBtn" style="display:none; margin-left:auto;">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <h2>My Listings</h2>
+        <div id="myListingsContainer"></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const myListingsContainer = document.getElementById("myListingsContainer");
+            const displayUser = document.getElementById("displayUser");
+            const logoutBtn = document.getElementById("logoutBtn");
+            let currentUser = localStorage.getItem("loggedInUser");
+
+            function updateUI() {
+                currentUser = localStorage.getItem("loggedInUser");
+                displayUser.textContent = currentUser ? "@Welcome, " + currentUser : "";
+                logoutBtn.style.display = currentUser ? "inline-block" : "none";
+                displayMyListings();
+            }
+
+            function saveListings(listings) {
+                localStorage.setItem("listings", JSON.stringify(listings));
+            }
+
+            function displayMyListings() {
+                let listings = JSON.parse(localStorage.getItem("listings")) || [];
+                let myListings = listings
+                    .map((l, i) => ({ ...l, idx: i }))
+                    .filter(l => l.user === currentUser);
+
+                myListingsContainer.innerHTML = "";
+                if (!currentUser) {
+                    myListingsContainer.innerHTML = "<p>Please log in to view your listings.</p>";
+                    return;
+                }
+                if (myListings.length === 0) {
+                    myListingsContainer.innerHTML = "<p>You have no listings.</p>";
+                    return;
+                }
+                myListings.forEach(listing => {
+                    const div = document.createElement("div");
+                    div.className = "listing-card";
+                    if (listing.editing) {
+                        div.innerHTML = `
+                            <div class="listing-details">
+                                <div class="edit-section">
+                                    <label>Title:
+                                        <input type="text" id="editTitle-${listing.idx}" value="${listing.title}" placeholder="Title" />
+                                    </label>
+                                    <label>Value:
+                                        <input type="number" id="editValue-${listing.idx}" value="${listing.value}" placeholder="Value" />
+                                    </label>
+                                    <label>Description:
+                                        <textarea id="editDescription-${listing.idx}" placeholder="Description">${listing.description}</textarea>
+                                    </label>
+                                    <label>Current Image:</label>
+                                    <div>
+                                        ${listing.image ? `<img src="${listing.image}" alt="Current Image" style="max-width:120px;display:block;margin-bottom:8px;">` : '<span style="color:#888;">No image</span>'}
+                                    </div>
+                                    <label>Change Image:
+                                        <input type="file" id="editImage-${listing.idx}" accept="image/*" />
+                                    </label>
+                                    <div id="editImagePreview-${listing.idx}" style="margin-bottom:8px;"></div>
+                                    <button onclick="saveEdit(${listing.idx})">Save</button>
+                                    <button onclick="cancelEdit(${listing.idx})">Cancel</button>
+                                </div>
+                            </div>
+                        `;
+                        // Preview new image on file select and store data for save
+                        setTimeout(() => {
+                            const fileInput = document.getElementById(`editImage-${listing.idx}`);
+                            const preview = document.getElementById(`editImagePreview-${listing.idx}`);
+                            if (fileInput) {
+                                fileInput._newImageData = null;
+                                fileInput.onchange = function () {
+                                    if (fileInput.files && fileInput.files[0]) {
+                                        const reader = new FileReader();
+                                        reader.onload = function (e) {
+                                            preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width:120px;">`;
+                                            fileInput._newImageData = e.target.result;
+                                        };
+                                        reader.readAsDataURL(fileInput.files[0]);
+                                    } else {
+                                        preview.innerHTML = "";
+                                        fileInput._newImageData = null;
+                                    }
+                                };
+                            }
+                        }, 0);
+                    } else {
+                        let html = "";
+                        if (listing.image) {
+                            html += `<img src="${listing.image}" alt="Listing Image">`;
+                        } else {
+                            html += `<img src="https://via.placeholder.com/180x120?text=No+Image" alt="No Image">`;
+                        }
+                        html += `<div class="listing-details">`;
+                        html += `<div class="listing-type">${listing.type}</div>`;
+                        html += `<div class="listing-title">${listing.title}</div>`;
+                        html += `<div class="listing-price">$${listing.value}</div>`;
+                        if (listing.type === "Car") {
+                            html += `<div class="listing-meta">Make: ${listing.carMake || "-"} | Model: ${listing.carModel || "-"} | Year: ${listing.carYear || "-"} | Mileage: ${listing.carMileage || "-"} km</div>`;
+                        }
+                        if (listing.type === "House") {
+                            html += `<div class="listing-meta">Bedrooms: ${listing.houseBedrooms || "-"} | Bathrooms: ${listing.houseBathrooms || "-"} | Land Size: ${listing.houseLandSize || "-"} sqm | Address: ${listing.houseAddress || "-"}</div>`;
+                        }
+                        html += `<div class="listing-description">${listing.description}</div>`;
+                        html += `<div class="timestamp">${listing.time}</div>`;
+                        html += `<div style="margin-top:8px;">
+                            <button onclick="editListing(${listing.idx})" style="background:#1877f2;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Edit</button>
+                            <button onclick="deleteListing(${listing.idx})" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button>
+                        </div>`;
+                        html += `</div>`;
+                        div.innerHTML = html;
+                    }
+                    myListingsContainer.appendChild(div);
+                });
+            }
+
+            window.editListing = function (idx) {
+                let listings = JSON.parse(localStorage.getItem("listings")) || [];
+                if (listings[idx].user === currentUser) {
+                    listings[idx].editing = true;
+                    localStorage.setItem("listings", JSON.stringify(listings));
+                    displayMyListings();
+                }
+            };
+
+            window.saveEdit = function (idx) {
+                let listings = JSON.parse(localStorage.getItem("listings")) || [];
+                if (listings[idx].user === currentUser) {
+                    listings[idx].title = document.getElementById(`editTitle-${idx}`).value.trim();
+                    listings[idx].value = document.getElementById(`editValue-${idx}`).value.trim();
+                    listings[idx].description = document.getElementById(`editDescription-${idx}`).value.trim();
+                    // Check for new image
+                    const fileInput = document.getElementById(`editImage-${idx}`);
+                    if (fileInput && fileInput._newImageData) {
+                        listings[idx].image = fileInput._newImageData;
+                    }
+                    listings[idx].editing = false;
+                    saveListings(listings);
+                    displayMyListings();
+                }
+            };
+
+            window.cancelEdit = function (idx) {
+                let listings = JSON.parse(localStorage.getItem("listings")) || [];
+                if (listings[idx].user === currentUser) {
+                    listings[idx].editing = false;
+                    saveListings(listings);
+                    displayMyListings();
+                }
+            };
+
+            window.deleteListing = function (idx) {
+                let listings = JSON.parse(localStorage.getItem("listings")) || [];
+                if (listings[idx].user === currentUser && confirm("Delete this listing?")) {
+                    listings.splice(idx, 1);
+                    saveListings(listings);
+                    displayMyListings();
+                }
+            };
+
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", function () {
+                    localStorage.removeItem("loggedInUser");
+                    window.location.href = "index.html";
+                });
+            }
+
+            updateUI();
+        });
+    </script>
+</body>
+</html>

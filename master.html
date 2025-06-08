@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MiniPost - Master Admin</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="fb-header">
+        <div class="fb-header-content" style="display: flex; align-items: center;">
+            <span class="fb-logo">MiniPost</span>
+            <span id="masterWelcome" class="fb-user" style="margin-left: 24px;"></span>
+            <div style="flex:1"></div>
+            <button id="logoutBtn" style="display:none; margin-left:auto;">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <div id="masterLoginSection">
+            <h2>Master Login</h2>
+            <form id="masterLoginForm" style="display: flex; align-items: center; gap: 8px; margin: 0 0 24px 0;">
+                <input type="text" id="masterUsername" placeholder="Username" required />
+                <input type="password" id="masterPassword" placeholder="Password" required />
+                <button type="submit">Login</button>
+            </form>
+        </div>
+        <div id="masterContent" style="display:none;">
+            <h2>All Listings (Admin Delete)</h2>
+            <div id="allPostsContainer"></div>
+            <h2>All User Credentials</h2>
+            <div id="allUsersContainer"></div>
+        </div>
+        <a href="index.html">← Back to Home</a>
+    </div>
+    <script src="master.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Listing - MiniPost</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="fb-header">
+        <div class="fb-header-content" style="display: flex; align-items: center;">
+            <span class="fb-logo">MiniPost</span>
+            <a href="index.html" style="margin-left:16px; color:#fff; text-decoration:none; font-weight:bold;">All Listings</a>
+            <form id="loginForm" class="fb-auth" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                <input type="text" id="username" placeholder="Username" required />
+                <input type="password" id="password" placeholder="Password" required />
+                <button type="submit" id="loginBtn">Login</button>
+                <button type="button" id="registerBtn">Register</button>
+            </form>
+            <span id="displayUser" class="fb-user" style="margin-left: 24px;"></span>
+            <a href="master.html" id="masterPageBtn" style="display:none; margin-left:16px; background:#fff; color:#1877f2; font-weight:bold; border-radius:4px; padding:6px 14px; text-decoration:none;">Master Page</a>
+            <div style="flex:1"></div>
+            <button id="logoutBtn" style="display:none; margin-left:auto;">Logout</button>
+        </div>
+    </header>
+    <div class="container">
+        <hr />
+        <div id="appSection">
+            <div id="listingFormSection" class="listing-form-section" style="display:none;">
+                <h2>Add a Listing</h2>
+                <form id="listingForm">
+                    <label>
+                        Type:
+                        <select id="listingType" required>
+                            <option value="">Select</option>
+                            <option value="Car">Car</option>
+                            <option value="House">House</option>
+                        </select>
+                    </label>
+                    <div id="carFields" style="display:none;">
+                        <label>Make: <input type="text" id="carMake" /></label>
+                        <label>Model: <input type="text" id="carModel" /></label>
+                        <label>Year: <input type="number" id="carYear" min="1900" max="2100" /></label>
+                        <label>Mileage (km): <input type="number" id="carMileage" min="0" /></label>
+                    </div>
+                    <div id="houseFields" style="display:none;">
+                        <label>Bedrooms: <input type="number" id="houseBedrooms" min="0" /></label>
+                        <label>Bathrooms: <input type="number" id="houseBathrooms" min="0" /></label>
+                        <label>Land Size (sqm): <input type="number" id="houseLandSize" min="0" /></label>
+                        <label>Address: <input type="text" id="houseAddress" /></label>
+                    </div>
+                    <label>
+                        Title:
+                        <input type="text" id="listingTitle" placeholder="e.g. 2018 Toyota Camry or 3BR Family Home" required />
+                    </label>
+                    <label>
+                        Value (USD):
+                        <input type="number" id="listingValue" placeholder="e.g. 15000 or 250000" required />
+                    </label>
+                    <label>
+                        Description:
+                        <textarea id="listingDescription" placeholder="Describe your car or house" required></textarea>
+                    </label>
+                    <label>
+                        Image:
+                        <input type="file" id="listingImage" accept="image/*" />
+                    </label>
+                    <div id="imageLoadingBar" style="display:none; margin-bottom:12px;">
+                        <div style="background:#e9ebee; border-radius:4px; overflow:hidden;">
+                            <div id="imageLoadingProgress" style="width:0%;height:8px;background:#1877f2;transition:width 0.2s;"></div>
+                        </div>
+                        <span id="imageLoadingText" style="font-size:0.95em;color:#1877f2;">Uploading image...</span>
+                    </div>
+                    <button type="submit">Add Listing</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="listing.js"></script>
+</body>
+</html>

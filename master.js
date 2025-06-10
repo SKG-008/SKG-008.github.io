@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             html += `<div class="listing-details">`;
             html += `<div class="listing-type">${listing.type}</div>`;
-            html += `<div class="listing-title">${listing.title}</div>`;
+            html += `<div class="listing-title">${listing.address}</div>`;
             html += `<div class="listing-price">$${listing.value}</div>`;
             if (listing.type === "Car") {
                 html += `<div class="listing-meta">Make: ${listing.carMake || "-"} | Model: ${listing.carModel || "-"} | Year: ${listing.carYear || "-"} | Mileage: ${listing.carMileage || "-"} km</div>`;

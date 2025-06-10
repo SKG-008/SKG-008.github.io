@@ -80,19 +80,87 @@ body {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 1100px;
     margin: 32px auto 0 auto;
     background: #fff;
-    padding: 24px 20px 32px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 32px 28px 36px 28px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(24,119,242,0.07);
     border: 1px solid #dddfe2;
+}
+
+.flex-container {
+    display: flex;
+    gap: 32px;
+}
+
+.sidebar {
+    min-width: 220px;
+    max-width: 260px;
+    background: #f7f8fa;
+    border: 1px solid #ccd0d5;
+    border-radius: 10px;
+    padding: 24px 18px 18px 18px;
+    box-shadow: 0 1px 4px rgba(24,119,242,0.04);
+    height: fit-content;
+}
+
+    .sidebar h3 {
+        color: #1877f2;
+        margin-top: 0;
+        margin-bottom: 18px;
+        font-size: 1.15em;
+        font-weight: 700;
+    }
+
+    .sidebar label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 500;
+        color: #333;
+        margin-top: 12px;
+    }
+
+    .sidebar input,
+    .sidebar select {
+        width: 100%;
+        margin-bottom: 8px;
+        padding: 7px 8px;
+        border-radius: 5px;
+        border: 1px solid #ccd0d5;
+        background: #fff;
+        font-size: 1em;
+        box-sizing: border-box;
+    }
+
+.filter-btn {
+    width: 100%;
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 0;
+    font-weight: 600;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .filter-btn:hover {
+        background: #145db2;
+    }
+
+.main-content {
+    flex: 1;
+    min-width: 0;
 }
 
 h1, h2 {
     color: #1877f2;
-    font-weight: 600;
+    font-weight: 700;
     margin-top: 0;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
 }
 
 form textarea {
@@ -117,11 +185,12 @@ form button,
     color: #fff;
     border: none;
     border-radius: 6px;
-    padding: 6px 16px;
+    padding: 7px 18px;
     margin-left: 4px;
-    font-weight: 500;
+    font-weight: 600;
     transition: background 0.2s;
     cursor: pointer;
+    font-size: 1em;
 }
 
     form button:hover,
@@ -129,19 +198,27 @@ form button,
         background: #145db2;
     }
 
-input[type="text"], input[type="password"], textarea {
+input[type="text"], input[type="password"], textarea, select, input[type="number"] {
     border: 1px solid #ccd0d5;
     border-radius: 6px;
     padding: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     width: 100%;
     box-sizing: border-box;
     font-size: 1em;
+    background: #f7f8fa;
+    transition: border 0.2s;
 }
+
+    input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus, input[type="number"]:focus {
+        border-color: #1877f2;
+        outline: none;
+    }
 
 a {
     color: #1877f2;
     text-decoration: none;
+    font-weight: 500;
 }
 
     a:hover {
@@ -149,47 +226,215 @@ a {
     }
 
 .post {
-    background: #f7f8fa;
+    display: flex;
+    align-items: flex-start;
+    background: #fff;
     border: 1px solid #ccd0d5;
-    border-radius: 8px;
-    margin: 16px 0;
-    padding: 16px;
-    position: relative;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    border-radius: 12px;
+    margin: 24px 0;
+    padding: 0;
+    box-shadow: 0 2px 12px rgba(24, 119, 242, 0.07);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    overflow: hidden;
+    min-height: 140px;
 }
+
+    .post:hover {
+        box-shadow: 0 6px 24px rgba(24, 119, 242, 0.13);
+        border-color: #1877f2;
+    }
 
     .post img {
-        max-width: 100%;
-        margin-top: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccd0d5;
+        width: 180px;
+        height: 120px;
+        object-fit: cover;
+        background: #f0f2f5;
+        border-right: 1px solid #eee;
+        border-radius: 0;
+        margin: 0;
+        display: block;
     }
 
-    .post .actions {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+    .post .listing-details {
+        flex: 1;
+        padding: 18px 20px 18px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
-    .post .timestamp {
-        font-size: 0.8em;
-        color: #65676b;
-    }
-
-.post-user {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 8px;
+.listing-title {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: #1877f2;
+    margin-bottom: 4px;
+    line-height: 1.2;
 }
 
-.top-bar {
+.listing-type {
+    display: inline-block;
+    background: #e9f0fb;
+    color: #1877f2;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 0.95em;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.listing-meta {
+    color: #555;
+    font-size: 0.98em;
+    margin-bottom: 8px;
+}
+
+.listing-price {
+    color: #42b72a;
+    font-size: 1.15em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.listing-description {
+    color: #444;
+    font-size: 1em;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre-line;
+    min-height: 3.6em;
+}
+
+.post .timestamp {
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.post-user {
+    font-size: 0.95em;
+    color: #888;
+    margin-bottom: 0;
+}
+
+.post .actions,
+.post .bookmark-btn {
+    margin-top: 10px;
+}
+
+.bookmark-btn {
+    background: #fff;
+    color: #0057b8;
+    border: 1px solid #0057b8;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-right: 8px;
+}
+
+    .bookmark-btn.in-bookmarks {
+        background: #0057b8;
+        color: #fff;
+    }
+
+    .bookmark-btn:hover {
+        background: #003e7e;
+        color: #fff;
+    }
+
+@media (max-width: 900px) {
+    .container {
+        max-width: 98vw;
+        padding: 10px 2vw 20px 2vw;
+    }
+
+    .flex-container {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .sidebar {
+        max-width: 100%;
+        margin-bottom: 18px;
+    }
+}
+
+@media (max-width: 700px) {
+    .fb-header-content {
+        max-width: 98vw;
+        padding: 0 4vw;
+    }
+
+    .post {
+        flex-direction: column;
+        min-height: unset;
+        padding: 0;
+    }
+
+        .post img {
+            width: 100%;
+            height: 160px;
+            border-right: none;
+            border-bottom: 1px solid #eee;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .post .listing-details {
+            padding: 14px 10px 14px 10px;
+        }
+}
+
+.no-image-text {
+    width: 180px;
+    height: 120px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    background: #f0f2f5;
+    color: #888;
+    font-size: 1em;
+    font-style: italic;
+    border-right: 1px solid #eee;
+    border-radius: 0;
+    margin: 0;
+    text-align: center;
+}
+
+#carFilters, #houseFilters {
     margin-bottom: 10px;
 }
 
-    .top-bar .welcome-msg {
-        margin: 0;
-        font-size: 2em;
+#fullListing img,
+#fullListing .no-image-text {
+    margin-top: 56px;
+}
+
+/* Sale/Rent nav below banner */
+.listing-type-nav {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 24px 0 0 0;
+}
+
+.listing-type-link {
+    font-size: 1.15em;
+    font-weight: bold;
+    color: #1877f2;
+    background: #e9f0fb;
+    border-radius: 6px;
+    padding: 8px 28px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+    .listing-type-link.active,
+    .listing-type-link:hover {
+        background: #1877f2;
+        color: #fff;
     }

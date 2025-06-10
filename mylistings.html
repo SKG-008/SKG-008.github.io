@@ -106,7 +106,7 @@
 
             function updateUI() {
                 currentUser = localStorage.getItem("loggedInUser");
-                displayUser.textContent = currentUser ? "@Welcome, " + currentUser : "";
+                displayUser.textContent = currentUser ? "Welcome, " + currentUser : "";
                 logoutBtn.style.display = currentUser ? "inline-block" : "none";
                 displayMyListings();
             }
@@ -189,7 +189,7 @@
                         }
                         html += `<div class="listing-details">`;
                         html += `<div class="listing-type">${listing.type}</div>`;
-                        html += `<div class="listing-title">${listing.title}</div>`;
+                        html += `<div class="listing-title">${listing.address}${listing.suburb ? ', ' + listing.suburb : ''}</div>`;
                         html += `<div class="listing-price">$${listing.value}</div>`;
                         if (listing.type === "Car") {
                             html += `<div class="listing-meta">Make: ${listing.carMake || "-"} | Model: ${listing.carModel || "-"} | Year: ${listing.carYear || "-"} | Mileage: ${listing.carMileage || "-"} km</div>`;

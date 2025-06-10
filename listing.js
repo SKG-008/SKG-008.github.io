@@ -1,175 +1,221 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Login/Register/Logout logic
-    const loginForm = document.getElementById("loginForm");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const displayUser = document.getElementById("displayUser");
-    const masterPageBtn = document.getElementById("masterPageBtn");
-    const registerBtn = document.getElementById("registerBtn");
-    const listingFormSection = document.getElementById("listingFormSection");
+// --- Profanity Filter ---
+const RUDE_PATTERNS = [
+    /\bfuck\w*\b/i, /\bshit\w*\b/i, /\bbitch\w*\b/i, /\basshole\b/i, /\bbastard\b/i,
+    /\bdick\w*\b/i, /\bpiss\w*\b/i, /\bcrap\w*\b/i, /\bdamn\w*\b/i, /\bcock\w*\b/i,
+    /\bpussy\w*\b/i, /\bfag\w*\b/i, /\bslut\w*\b/i, /\bdouche\w*\b/i, /\bbollocks\b/i,
+    /\bbugger\b/i, /\barse\w*\b/i, /\bwank\w*\b/i, /\btwat\w*\b/i, /\bprick\w*\b/i
+];
 
-    let users = JSON.parse(localStorage.getItem("users")) || {};
-    let currentUser = localStorage.getItem("loggedInUser");
+function containsRudeWordAI(text) {
+    if (!text) return false;
+    return RUDE_PATTERNS.some(pattern => pattern.test(text));
+}
 
-    if (!users["MasterLogin"]) {
-        users["MasterLogin"] = "MasterLogin";
-        localStorage.setItem("users", JSON.stringify(users));
-    }
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isView = urlParams.has("view");
+    const formContainer = document.getElementById("listingFormContainer");
+    const fullListingContainer = document.getElementById("fullListing");
 
-    function updateUI() {
-        currentUser = localStorage.getItem("loggedInUser");
-        if (currentUser) {
-            displayUser.textContent = "@Welcome, " + currentUser;
-            logoutBtn.style.display = "inline-block";
-            if (loginForm) loginForm.style.display = "none";
-            if (masterPageBtn) masterPageBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
-            if (listingFormSection) listingFormSection.style.display = "block";
-        } else {
-            displayUser.textContent = "";
-            logoutBtn.style.display = "none";
-            if (loginForm) loginForm.style.display = "flex";
-            if (masterPageBtn) masterPageBtn.style.display = "none";
-            if (listingFormSection) listingFormSection.style.display = "none";
-        }
-    }
+    // Show add form if not in view mode and no selectedListing
+    if (formContainer && !isView) {
+        localStorage.removeItem("selectedListing");
+        let formHtml = `
+            <h2>Add Property Listing</h2>
+            <form id="listingForm" enctype="multipart/form-data">
+                <label for="listingMode">Listing Type</label>
+                <select id="listingMode" required>
+                    <option value="sale">For Sale</option>
+                    <option value="rent">For Rent</option>
+                </select>
 
-    if (loginForm) {
-        loginForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value;
-            if (users[username] && users[username] === password) {
-                localStorage.setItem("loggedInUser", username);
-                updateUI();
+                <label for="listingAddress">Address</label>
+                <input type="text" id="listingAddress" required>
+
+                <label for="listingSuburb">Suburb</label>
+                <input type="text" id="listingSuburb" required>
+
+                <label for="listingType">Property Type</label>
+                <select id="listingType" required>
+                    <option value="">Select</option>
+                    <option value="House">House</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="Townhouse">Townhouse</option>
+                    <option value="Unit">Unit</option>
+                    <option value="Studio">Studio</option>
+                </select>
+
+                <label for="listingLandSize">Land Size (sqm)</label>
+                <input type="number" id="listingLandSize" min="0">
+
+                <div id="salePriceGroup">
+                    <label for="listingSalePrice">Sale Price ($)</label>
+                    <input type="number" id="listingSalePrice" min="0">
+                </div>
+                <div id="rentPriceGroup" style="display:none;">
+                    <label for="listingRentPrice">Rent per week ($)</label>
+                    <input type="number" id="listingRentPrice" min="0">
+                </div>
+
+                <label for="listingBedrooms">Bedrooms</label>
+                <input type="number" id="listingBedrooms" required min="0">
+
+                <label for="listingBathrooms">Bathrooms</label>
+                <input type="number" id="listingBathrooms" required min="0">
+
+                <label for="listingCarPark">Car Park</label>
+                <input type="number" id="listingCarPark" min="0">
+
+                <label for="listingParkingType">Type of Parking</label>
+                <select id="listingParkingType">
+                    <option value="">Select</option>
+                    <option value="Garage">Garage</option>
+                    <option value="Carport">Carport</option>
+                    <option value="Open">Open</option>
+                    <option value="Street">Street</option>
+                    <option value="None">None</option>
+                </select>
+
+                <label for="listingInspectionDates">Inspection Dates</label>
+                <input type="text" id="listingInspectionDates" placeholder="e.g. Sat 10am-11am, Sun 2pm-3pm">
+
+                <label for="listingDescription">Description</label>
+                <textarea id="listingDescription" required></textarea>
+
+                <label for="listingImages">Images</label>
+                <input type="file" id="listingImages" name="listingImages" accept="image/*" multiple>
+
+                <button type="submit" class="filter-btn">Add Listing</button>
+            </form>
+        `;
+        formContainer.innerHTML = formHtml;
+
+        // Toggle price fields based on listing type
+        const listingMode = document.getElementById("listingMode");
+        const salePriceGroup = document.getElementById("salePriceGroup");
+        const rentPriceGroup = document.getElementById("rentPriceGroup");
+        listingMode.addEventListener("change", function () {
+            if (listingMode.value === "rent") {
+                salePriceGroup.style.display = "none";
+                rentPriceGroup.style.display = "";
             } else {
-                alert("Invalid credentials");
+                salePriceGroup.style.display = "";
+                rentPriceGroup.style.display = "none";
             }
         });
-    }
 
-    if (registerBtn) {
-        registerBtn.addEventListener("click", function () {
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value;
-            if (!username || !password) return alert("Fill in both fields");
-            if (users[username]) return alert("Username already taken");
-            users[username] = password;
-            localStorage.setItem("users", JSON.stringify(users));
-            alert("Registered! Now log in.");
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", function () {
-            localStorage.removeItem("loggedInUser");
-            updateUI();
-        });
-    }
-
-    updateUI();
-
-    // Listing form logic
-    const listingForm = document.getElementById("listingForm");
-    const listingType = document.getElementById("listingType");
-    const carFields = document.getElementById("carFields");
-    const houseFields = document.getElementById("houseFields");
-    const imageLoadingBar = document.getElementById("imageLoadingBar");
-    const imageLoadingProgress = document.getElementById("imageLoadingProgress");
-    const imageLoadingText = document.getElementById("imageLoadingText");
-
-    if (listingType) {
-        listingType.addEventListener("change", function () {
-            if (listingType.value === "Car") {
-                carFields.style.display = "block";
-                houseFields.style.display = "none";
-            } else if (listingType.value === "House") {
-                carFields.style.display = "none";
-                houseFields.style.display = "block";
-            } else {
-                carFields.style.display = "none";
-                houseFields.style.display = "none";
-            }
-        });
-    }
-
-    if (listingForm) {
-        listingForm.addEventListener("submit", function (e) {
+        const form = document.getElementById("listingForm");
+        form.addEventListener("submit", function (e) {
             e.preventDefault();
-            const type = listingType.value;
-            const title = document.getElementById("listingTitle").value.trim();
-            const value = document.getElementById("listingValue").value.trim();
+            const mode = document.getElementById("listingMode").value;
+            const address = document.getElementById("listingAddress").value.trim();
+            const suburb = document.getElementById("listingSuburb").value.trim();
+            const type = document.getElementById("listingType").value;
+            const landSize = document.getElementById("listingLandSize").value;
+            const salePrice = document.getElementById("listingSalePrice").value;
+            const rentPrice = document.getElementById("listingRentPrice").value;
+            const value = mode === "rent" ? rentPrice : salePrice;
+            const bedrooms = document.getElementById("listingBedrooms").value;
+            const bathrooms = document.getElementById("listingBathrooms").value;
+            const carPark = document.getElementById("listingCarPark").value;
+            const parkingType = document.getElementById("listingParkingType").value;
+            const inspectionDates = document.getElementById("listingInspectionDates").value.trim();
             const description = document.getElementById("listingDescription").value.trim();
-            const file = document.getElementById("listingImage").files[0];
+            const imagesInput = document.getElementById("listingImages");
 
-            // Car fields
-            const carMake = document.getElementById("carMake").value.trim();
-            const carModel = document.getElementById("carModel").value.trim();
-            const carYear = document.getElementById("carYear").value.trim();
-            const carMileage = document.getElementById("carMileage").value.trim();
+            // Profanity check
+            if (containsRudeWordAI(address) || containsRudeWordAI(description)) {
+                alert("Your listing contains inappropriate language. Please remove any rude words.");
+                return;
+            }
 
-            // House fields
-            const houseBedrooms = document.getElementById("houseBedrooms").value.trim();
-            const houseBathrooms = document.getElementById("houseBathrooms").value.trim();
-            const houseLandSize = document.getElementById("houseLandSize").value.trim();
-            const houseAddress = document.getElementById("houseAddress").value.trim();
+            // Read images as Data URLs
+            const files = Array.from(imagesInput.files);
+            let imageDataArray = [];
+            if (files.length > 0) {
+                let loaded = 0;
+                files.forEach((file, idx) => {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        imageDataArray[idx] = event.target.result;
+                        loaded++;
+                        if (loaded === files.length) {
+                            saveListing();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                saveListing();
+            }
 
-            function addListing(imageData) {
+            function saveListing() {
+                let listings = JSON.parse(localStorage.getItem("listings") || "[]");
+                const user = localStorage.getItem("loggedInUser") || "Guest";
                 const newListing = {
+                    mode,
+                    address,
+                    suburb,
                     type,
-                    title,
+                    landSize,
                     value,
+                    bedrooms,
+                    bathrooms,
+                    carPark,
+                    parkingType,
+                    inspectionDates,
                     description,
-                    image: imageData,
-                    time: new Date().toLocaleString(),
-                    user: localStorage.getItem("loggedInUser") || "Guest",
-                    carMake, carModel, carYear, carMileage,
-                    houseBedrooms, houseBathrooms, houseLandSize, houseAddress
+                    images: imageDataArray,
+                    user,
+                    time: new Date().toLocaleString()
                 };
-                let listings = JSON.parse(localStorage.getItem("listings")) || [];
-                listings.unshift(newListing);
+                listings.push(newListing);
                 localStorage.setItem("listings", JSON.stringify(listings));
                 alert("Listing added!");
-                listingForm.reset();
-                carFields.style.display = "none";
-                houseFields.style.display = "none";
-                if (imageLoadingBar) {
-                    imageLoadingBar.style.display = "none";
-                    imageLoadingProgress.style.width = "0%";
-                }
-            }
-
-            if (file) {
-                if (imageLoadingBar) {
-                    imageLoadingBar.style.display = "block";
-                    imageLoadingProgress.style.width = "0%";
-                    imageLoadingText.textContent = "Uploading image...";
-                }
-                const reader = new FileReader();
-                reader.onprogress = function (event) {
-                    if (event.lengthComputable && imageLoadingProgress) {
-                        const percent = Math.round((event.loaded / event.total) * 100);
-                        imageLoadingProgress.style.width = percent + "%";
-                    }
-                };
-                reader.onloadstart = function () {
-                    if (imageLoadingProgress) imageLoadingProgress.style.width = "0%";
-                };
-                reader.onload = function () {
-                    addListing(reader.result);
-                };
-                reader.onloadend = function () {
-                    if (imageLoadingProgress) imageLoadingProgress.style.width = "100%";
-                    if (imageLoadingText) imageLoadingText.textContent = "Image uploaded!";
-                    setTimeout(() => {
-                        if (imageLoadingBar) imageLoadingBar.style.display = "none";
-                        imageLoadingProgress.style.width = "0%";
-                    }, 800);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                addListing(null);
+                window.location.href = "index.html?" + mode;
             }
         });
+        return;
+    }
+
+    // Otherwise, show the full listing if selectedListing exists
+    const listing = JSON.parse(localStorage.getItem("selectedListing"));
+    if (listing && fullListingContainer) {
+        let html = "";
+
+        // Back button at top left
+        html += `<button id="backBtn" style="position:absolute;left:24px;top:24px;z-index:10;background:#1877f2;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-weight:600;cursor:pointer;">&#8592; Back</button>`;
+
+        // Multiple images or placeholder
+        if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
+            html += `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:56px;margin-bottom:16px;">`;
+            listing.images.forEach(img =>
+                html += `<img src="${img}" alt="Listing Image" style="max-width:220px;max-height:160px;border-radius:8px;border:1px solid #eee;">`
+            );
+            html += `</div>`;
+        } else {
+            html += `<div class="no-image-text" style="margin-top:56px;margin-bottom:16px;">No Pictures to Display</div>`;
+        }
+
+        html += `<div class="listing-type">${listing.type || "Property"}${listing.suburb ? " - " + listing.suburb : ""}</div>`;
+        html += `<div class="listing-title">${listing.address}</div>`;
+        html += `<div class="listing-price">${listing.mode === "rent" ? "$" + Number(listing.value).toLocaleString() + " / week" : "$" + Number(listing.value).toLocaleString()}</div>`;
+        html += `<div class="listing-meta">Land Size: ${listing.landSize || "-"} sqm | Bedrooms: ${listing.bedrooms || "-"} | Bathrooms: ${listing.bathrooms || "-"}</div>`;
+        html += `<div class="listing-meta">Car Park: ${listing.carPark || "-"} | Parking Type: ${listing.parkingType || "-"}</div>`;
+        html += `<div class="listing-meta">Inspection Dates: ${listing.inspectionDates || "-"}</div>`;
+        html += `<div class="listing-description" style="white-space:pre-line;margin-top:12px;">${listing.description}</div>`;
+        html += `<div class="timestamp">${listing.time || ""}</div>`;
+        html += `<div style="font-size:0.9em;color:#888;">Listed by: ${listing.user || "Guest"}</div>`;
+
+        fullListingContainer.innerHTML = html;
+
+        // Back button logic
+        const backBtn = document.getElementById("backBtn");
+        if (backBtn) {
+            backBtn.addEventListener("click", function () {
+                localStorage.removeItem("selectedListing");
+                window.history.length > 1 ? window.history.back() : window.location.href = "index.html?" + (listing.mode || "sale");
+            });
+        }
     }
 });
-
-

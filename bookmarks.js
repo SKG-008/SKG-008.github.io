@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return allBookmarks[currentUser] || [];
     }
 
-    function displayBookmarks() {
-        let listings = JSON.parse(localStorage.getItem("listings")) || [];
+    async function displayBookmarks() {
+        let listings = await ListingsAPI.getListings();
         let bookmarks = getBookmarks();
 
         bookmarksContainer.innerHTML = "";
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Find the full listing object for each bookmark
         let bookmarkedListings = bookmarks
-            .map(id => listings[id] || null)
+            .map(id => listings.find(listing => listing.id === id) || null)
             .filter(l => l);
 
         if (bookmarkedListings.length === 0) {

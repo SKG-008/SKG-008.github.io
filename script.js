@@ -198,15 +198,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // --- Delete Listing Logic ---
-    function saveListings(listings) {
-        localStorage.setItem("listings", JSON.stringify(listings));
-    }
-
-    window.deleteListing = function (index) {
-        let listings = JSON.parse(localStorage.getItem("listings")) || [];
+    window.deleteListing = async function (id) {
         if (confirm("Delete this listing?")) {
-            listings.splice(index, 1);
-            saveListings(listings);
+            await ListingsAPI.deleteListing(id);
             displayListings();
         }
     };
@@ -237,8 +231,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Listing Display ---
-    function displayListings() {
-        let listings = JSON.parse(localStorage.getItem("listings")) || [];
+    async function displayListings() {
+        // Get listings from API
+        let listings = await ListingsAPI.getListings();
         // Only show listings of the current mode
         listings = listings.filter(l => l.mode === mode);
 
@@ -300,9 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<div class="listing-title">${listing.address || ""}</div>`;
             // Price
             if (mode === "rent") {
-                html += `<div class="listing-price">$${Number(listing.value).toLocaleString()} / week</div>`;
+                html += `<div class="listing-price">${Number(listing.value).toLocaleString()} / week</div>`;
             } else {
-                html += `<div class="listing-price">$${Number(listing.value).toLocaleString()}</div>`;
+                html += `<div class="listing-price">${Number(listing.value).toLocaleString()}</div>`;
             }
             // Meta
             html += `<div class="listing-meta">Bedrooms: ${listing.bedrooms || "-"} | Bathrooms: ${listing.bathrooms || "-"}</div>`;
@@ -318,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (
                 (currentUser && (currentUser === "MasterLogin" || currentUser === listing.user))
             ) {
-                html += `<button onclick="deleteListing(${idx});event.stopPropagation();" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button>`;
+                html += `<button onclick="deleteListing('${listing.id}');event.stopPropagation();" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button>`;
             }
             const listingId = listing.id || idx.toString();
             const isMarked = isBookmarked(listingId);

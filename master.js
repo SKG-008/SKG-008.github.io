@@ -9,14 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const masterWelcome = document.getElementById("masterWelcome");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    function renderListings() {
-        const listings = JSON.parse(localStorage.getItem("listings")) || [];
+    async function renderListings() {
+        const listings = await ListingsAPI.getListings();
         allPostsContainer.innerHTML = "";
         if (listings.length === 0) {
             allPostsContainer.innerHTML = "<p>No listings yet.</p>";
             return;
         }
-        listings.forEach((listing, index) => {
+        listings.forEach((listing) => {
             const div = document.createElement("div");
             div.className = "listing-card";
             let html = "";
@@ -38,18 +38,16 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<div class="listing-description">${listing.description}</div>`;
             html += `<div class="timestamp">${listing.time}</div>`;
             html += `<div style="font-size:0.9em;color:#888;">Listed by: ${listing.user || "Guest"}</div>`;
-            html += `<div style="margin-top:8px;"><button onclick="deleteListing(${index})" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button></div>`;
+            html += `<div style="margin-top:8px;"><button onclick="deleteListing('${listing.id}')" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button></div>`;
             html += `</div>`;
             div.innerHTML = html;
             allPostsContainer.appendChild(div);
         });
     }
 
-    window.deleteListing = function (index) {
-        let listings = JSON.parse(localStorage.getItem("listings")) || [];
+    window.deleteListing = async function (id) {
         if (confirm("Delete this listing?")) {
-            listings.splice(index, 1);
-            localStorage.setItem("listings", JSON.stringify(listings));
+            await ListingsAPI.deleteListing(id);
             renderListings();
         }
     };

@@ -149,8 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 saveListing();
             }
 
-            function saveListing() {
-                let listings = JSON.parse(localStorage.getItem("listings") || "[]");
+            async function saveListing() {
                 const user = localStorage.getItem("loggedInUser") || "Guest";
                 const newListing = {
                     mode,
@@ -169,10 +168,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     user,
                     time: new Date().toLocaleString()
                 };
-                listings.push(newListing);
-                localStorage.setItem("listings", JSON.stringify(listings));
-                alert("Listing added!");
-                window.location.href = "index.html?" + mode;
+                
+                try {
+                    await ListingsAPI.addListing(newListing);
+                    alert("Listing added!");
+                    window.location.href = "index.html?" + mode;
+                } catch (error) {
+                    console.error("Error saving listing:", error);
+                    alert("Failed to save listing. Please try again.");
+                }
             }
         });
         return;

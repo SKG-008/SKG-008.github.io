@@ -97,6 +97,7 @@
         <h2>My Listings</h2>
         <div id="myListingsContainer"></div>
     </div>
+    <script src="api.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const myListingsContainer = document.getElementById("myListingsContainer");
@@ -115,10 +116,9 @@
                 localStorage.setItem("listings", JSON.stringify(listings));
             }
 
-            function displayMyListings() {
-                let listings = JSON.parse(localStorage.getItem("listings")) || [];
+            async function displayMyListings() {
+                let listings = await ListingsAPI.getListings();
                 let myListings = listings
-                    .map((l, i) => ({ ...l, idx: i }))
                     .filter(l => l.user === currentUser);
 
                 myListingsContainer.innerHTML = "";
@@ -245,11 +245,9 @@
                 }
             };
 
-            window.deleteListing = function (idx) {
-                let listings = JSON.parse(localStorage.getItem("listings")) || [];
-                if (listings[idx].user === currentUser && confirm("Delete this listing?")) {
-                    listings.splice(idx, 1);
-                    saveListings(listings);
+            window.deleteListing = async function (id) {
+                if (confirm("Delete this listing?")) {
+                    await ListingsAPI.deleteListing(id);
                     displayMyListings();
                 }
             };

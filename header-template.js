@@ -62,9 +62,7 @@ function initializeHeader() {
         // Initialize authentication and mobile menu after header is created
         setTimeout(() => {
             initializeAuth();
-            if (window.initializeMobileMenu) {
-                window.initializeMobileMenu();
-            }
+            initializeMobileMenuDirect();
         }, 100);
     }
 }
@@ -221,6 +219,26 @@ document.addEventListener('visibilitychange', function() {
 
 // Reinitialize on focus
 window.addEventListener('focus', ensureHeaderStability);
+
+// Initialize mobile menu directly
+function initializeMobileMenuDirect() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDropdown = document.getElementById('mobileDropdown');
+    
+    if (mobileMenuBtn && mobileDropdown) {
+        mobileMenuBtn.onclick = function(e) {
+            e.preventDefault();
+            const isShowing = mobileDropdown.classList.contains('show');
+            if (isShowing) {
+                mobileDropdown.classList.remove('show');
+                this.innerHTML = '☰';
+            } else {
+                mobileDropdown.classList.add('show');
+                this.innerHTML = '✕';
+            }
+        };
+    }
+}
 
 // Make functions globally available
 window.updateAuthUI = updateAuthUI;

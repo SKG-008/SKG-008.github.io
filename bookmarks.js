@@ -47,7 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Images (show first image, or placeholder)
             if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-                html += `<img src="${listing.images[0]}" alt="Listing Image">`;
+                html += `<img src="${listing.images[0]}" alt="Listing Image" onclick="openImageModal('${listing.images[0]}', 0, ${JSON.stringify(listing.images).replace(/"/g, '&quot;')});event.stopPropagation();" style="cursor:pointer;">`;
+            } else if (listing.image) {
+                html += `<img src="${listing.image}" alt="Listing Image">`;
             } else {
                 html += `<div class="no-image-text">No Pictures to Display</div>`;
             }
@@ -73,6 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<div class="timestamp">${listing.time || ""}</div>`;
             // User
             html += `<div style="font-size:0.9em;color:#888;">Listed by: ${listing.user || "Guest"}</div>`;
+            html += `<div style="margin-top:8px;">`;
+            html += `<button onclick="shareListing(${JSON.stringify(listing).replace(/"/g, '&quot;')});event.stopPropagation();" style="background:#1877f2;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Share</button>`;
+            html += `</div>`;
             html += `</div>`; // .listing-details
             div.innerHTML = html;
             bookmarksContainer.appendChild(div);
@@ -87,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (displayUser) {
-        displayUser.textContent = currentUser ? "Welcome, " + currentUser : "";
+        displayUser.textContent = currentUser || "";
         logoutBtn.style.display = currentUser ? "inline-block" : "none";
     }
 

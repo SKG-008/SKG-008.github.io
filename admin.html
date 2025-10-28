@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Virtual.Market - Admin</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="fb-header">
+        <div class="fb-header-content">
+            <div class="header-main">
+                <span class="fb-logo">Virtual.Market - Admin</span>
+                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
+            </div>
+            <div class="desktop-nav">
+                <a href="index.html" class="nav-link">Home</a>
+            </div>
+            <div id="mobileDropdown" class="mobile-dropdown">
+                <div class="mobile-nav-links">
+                    <a href="index.html" class="mobile-nav-link">Home</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <h2>Admin Tools</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <h3>GitHub Sync</h3>
+            <p>Export listings to update your GitHub repository:</p>
+            <button id="syncBtn" class="filter-btn">Export Listings JSON</button>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <h3>GitHub Configuration</h3>
+            <form id="githubConfigForm">
+                <label for="repoName">GitHub Repository (username/repo):</label>
+                <input type="text" id="repoName" placeholder="e.g., yourusername/your-repo">
+                
+                <label for="branchName">Branch Name:</label>
+                <input type="text" id="branchName" placeholder="e.g., main">
+                
+                <button type="submit" class="filter-btn">Save Configuration</button>
+            </form>
+        </div>
+        
+        <div>
+            <h3>Instructions</h3>
+            <ol>
+                <li>Enter your GitHub repository information above</li>
+                <li>Click "Export Listings JSON" to download the current listings</li>
+                <li>Upload the downloaded file to your GitHub repository at <code>data/listings.json</code></li>
+                <li>Wait a few minutes for GitHub Pages to update</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script src="api.js"></script>
+    <script src="sync.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const configForm = document.getElementById('githubConfigForm');
+            const repoInput = document.getElementById('repoName');
+            const branchInput = document.getElementById('branchName');
+            
+            // Load saved config
+            const savedRepo = localStorage.getItem('githubRepo');
+            const savedBranch = localStorage.getItem('githubBranch');
+            
+            if (savedRepo) repoInput.value = savedRepo;
+            if (savedBranch) branchInput.value = savedBranch;
+            
+            configForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const repo = repoInput.value.trim();
+                const branch = branchInput.value.trim();
+                
+                if (repo && branch) {
+                    localStorage.setItem('githubRepo', repo);
+                    localStorage.setItem('githubBranch', branch);
+                    alert('GitHub configuration saved!');
+                } else {
+                    alert('Please enter both repository and branch name.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

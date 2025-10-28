@@ -82,13 +82,39 @@ document.addEventListener("DOMContentLoaded", function () {
                 <label for="listingDescription">Description</label>
                 <textarea id="listingDescription" required></textarea>
 
-                <label for="listingImages">Images</label>
+                <label for="listingImages">Images (Max 3 images, 2MB each)</label>
                 <input type="file" id="listingImages" name="listingImages" accept="image/*" multiple>
+                <div id="imagePreview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;"></div>
 
                 <button type="submit" class="filter-btn">Add Listing</button>
             </form>
         `;
         formContainer.innerHTML = formHtml;
+
+        // Image preview functionality
+        const imagesInput = document.getElementById('listingImages');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        imagesInput.addEventListener('change', function() {
+            imagePreview.innerHTML = '';
+            const files = Array.from(this.files).slice(0, 3); // Max 3 images
+            
+            files.forEach((file, index) => {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert(`Image ${file.name} is too large. Max size is 2MB.`);
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:100px;height:100px;object-fit:cover;border-radius:5px;border:1px solid #ccc;';
+                    imagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
 
         // Toggle price fields based on listing type
         const listingMode = document.getElementById("listingMode");
@@ -105,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const form = document.getElementById("listingForm");
-        form.addEventListener("submit", function (e) {
+        form.addEventListener("submit", async function (e) {
             e.preventDefault();
             const mode = document.getElementById("listingMode").value;
             const address = document.getElementById("listingAddress").value.trim();
@@ -122,6 +148,20 @@ document.addEventListener("DOMContentLoaded", function () {
             const inspectionDates = document.getElementById("listingInspectionDates").value.trim();
             const description = document.getElementById("listingDescription").value.trim();
             const imagesInput = document.getElementById("listingImages");
+            
+            // Validate images
+            const files = Array.from(imagesInput.files);
+            if (files.length > 3) {
+                alert('Maximum 3 images allowed.');
+                return;
+            }
+            
+            for (let file of files) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert(`Image ${file.name} is too large. Maximum size is 2MB.`);
+                    return;
+                }
+            }
 
             // Profanity check
             if (containsRudeWordAI(address) || containsRudeWordAI(description)) {
@@ -129,24 +169,32 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Read images as Data URLs
-            const files = Array.from(imagesInput.files);
+            // Process images
             let imageDataArray = [];
             if (files.length > 0) {
-                let loaded = 0;
-                files.forEach((file, idx) => {
-                    const reader = new FileReader();
-                    reader.onload = function (event) {
-                        imageDataArray[idx] = event.target.result;
-                        loaded++;
-                        if (loaded === files.length) {
-                            saveListing();
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                });
+                try {
+                    // Show loading message
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Processing images...';
+                    submitBtn.disabled = true;
+                    
+                    const processPromises = files.map(file => ImageUtils.processImage(file));
+                    imageDataArray = await Promise.all(processPromises);
+                    
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    await saveListing();
+                } catch (error) {
+                    console.error('Image processing error:', error);
+                    alert('Image processing failed. Please try again.');
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.textContent = 'Add Listing';
+                    submitBtn.disabled = false;
+                }
             } else {
-                saveListing();
+                await saveListing();
             }
 
             async function saveListing() {
@@ -171,11 +219,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 try {
                     await ListingsAPI.addListing(newListing);
-                    alert("Listing added!");
-                    window.location.href = "index.html?" + mode;
+                    if (window.UIEnhancements) {
+                        window.UIEnhancements.showToast("Listing added successfully!", "success");
+                    }
+                    setTimeout(() => {
+                        window.location.href = "index.html?" + mode;
+                    }, 1500);
                 } catch (error) {
                     console.error("Error saving listing:", error);
-                    alert("Failed to save listing. Please try again.");
+                    if (window.UIEnhancements) {
+                        window.UIEnhancements.showToast("Failed to save listing. Please try again.", "error");
+                    } else {
+                        alert("Failed to save listing. Please try again.");
+                    }
                 }
             }
         });
@@ -193,8 +249,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Multiple images or placeholder
         if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
             html += `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:56px;margin-bottom:16px;">`;
-            listing.images.forEach(img =>
-                html += `<img src="${img}" alt="Listing Image" style="max-width:220px;max-height:160px;border-radius:8px;border:1px solid #eee;">`
+            listing.images.forEach((img, index) =>
+                html += `<img src="${img}" alt="Listing Image" onclick="openImageModal('${img}', ${index}, ${JSON.stringify(listing.images).replace(/"/g, '&quot;')})" style="max-width:220px;max-height:160px;border-radius:8px;border:1px solid #eee;cursor:pointer;">`
             );
             html += `</div>`;
         } else {
@@ -210,6 +266,9 @@ document.addEventListener("DOMContentLoaded", function () {
         html += `<div class="listing-description" style="white-space:pre-line;margin-top:12px;">${listing.description}</div>`;
         html += `<div class="timestamp">${listing.time || ""}</div>`;
         html += `<div style="font-size:0.9em;color:#888;">Listed by: ${listing.user || "Guest"}</div>`;
+        html += `<div style="margin-top:12px;">`;
+        html += `<button onclick="shareListing(${JSON.stringify(listing).replace(/"/g, '&quot;')})" style="background:#1877f2;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-weight:600;cursor:pointer;">Share Listing</button>`;
+        html += `</div>`;
 
         fullListingContainer.innerHTML = html;
 

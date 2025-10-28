@@ -20,10 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const div = document.createElement("div");
             div.className = "listing-card";
             let html = "";
-            if (listing.image) {
+            if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
+                html += `<img src="${listing.images[0]}" alt="Listing Image" onclick="openImageModal('${listing.images[0]}', 0, ${JSON.stringify(listing.images).replace(/"/g, '&quot;')});event.stopPropagation();" style="cursor:pointer;">`;
+            } else if (listing.image) {
                 html += `<img src="${listing.image}" alt="Listing Image">`;
             } else {
-                html += `<img src="https://via.placeholder.com/180x120?text=No+Image" alt="No Image">`;
+                html += `<div class="no-image-text">No Pictures to Display</div>`;
             }
             html += `<div class="listing-details">`;
             html += `<div class="listing-type">${listing.type}</div>`;
@@ -38,7 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<div class="listing-description">${listing.description}</div>`;
             html += `<div class="timestamp">${listing.time}</div>`;
             html += `<div style="font-size:0.9em;color:#888;">Listed by: ${listing.user || "Guest"}</div>`;
-            html += `<div style="margin-top:8px;"><button onclick="deleteListing('${listing.id}')" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button></div>`;
+            html += `<div style="margin-top:8px;">`;
+            html += `<button onclick="deleteListing('${listing.id}')" style="background:#e53935;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;">Delete</button>`;
+            html += `<button onclick="shareListing(${JSON.stringify(listing).replace(/"/g, '&quot;')});event.stopPropagation();" style="background:#42b72a;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;margin-left:8px;">Share</button>`;
+            html += `</div>`;
             html += `</div>`;
             div.innerHTML = html;
             allPostsContainer.appendChild(div);
@@ -70,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function showMasterContent() {
         masterLoginSection.style.display = "none";
         masterContent.style.display = "block";
-        masterWelcome.textContent = "Welcome, MasterLogin";
+        masterWelcome.textContent = "MasterLogin";
         logoutBtn.style.display = "inline-block";
         renderListings();
         renderUsers();

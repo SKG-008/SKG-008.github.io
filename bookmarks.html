@@ -8,10 +8,21 @@
 </head>
 <body>
     <header class="fb-header">
-        <div class="fb-header-content" style="display: flex; align-items: center;">
-            <span class="fb-logo">Virtual.Market</span>
-            <a href="index.html" style="margin-left:16px; color:#fff; text-decoration:none; font-weight:bold;">Home</a>
-            <a href="bookmarks.html" style="margin-left:16px; color:#fff; text-decoration:none; font-weight:bold;">Bookmarks</a>
+        <div class="fb-header-content">
+            <div class="header-main">
+                <span class="fb-logo">Virtual.Market</span>
+                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
+            </div>
+            <div class="desktop-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="bookmarks.html" class="nav-link">Bookmarks</a>
+            </div>
+            <div id="mobileDropdown" class="mobile-dropdown">
+                <div class="mobile-nav-links">
+                    <a href="index.html" class="mobile-nav-link">Home</a>
+                    <a href="bookmarks.html" class="mobile-nav-link">Bookmarks</a>
+                </div>
+            </div>
         </div>
     </header>
     <div class="container">
@@ -19,6 +30,9 @@
         <div id="bookmarksContainer"></div>
     </div>
     <script src="api.js"></script>
+    <script src="imageModal.js"></script>
+    <script src="share.js"></script>
+    <script src="mobile-menu.js"></script>
     <script src="bookmarks.js"></script>
 </body>
 </html>

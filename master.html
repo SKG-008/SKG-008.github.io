@@ -8,11 +8,23 @@
 </head>
 <body>
     <header class="fb-header">
-        <div class="fb-header-content" style="display: flex; align-items: center;">
-            <span class="fb-logo">MiniPost</span>
-            <span id="masterWelcome" class="fb-user" style="margin-left: 24px;"></span>
-            <div style="flex:1"></div>
-            <button id="logoutBtn" style="display:none; margin-left:auto;">Logout</button>
+        <div class="fb-header-content">
+            <div class="header-main">
+                <span class="fb-logo">Virtual.Market - Master</span>
+                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
+            </div>
+            <div class="desktop-nav">
+                <span id="masterWelcome" class="fb-user"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+            <div id="mobileDropdown" class="mobile-dropdown">
+                <div class="mobile-user-info">
+                    <span id="mobileMasterWelcome"></span>
+                </div>
+                <div class="mobile-nav-links">
+                    <button id="mobileLogoutBtn" class="mobile-logout-btn">Logout</button>
+                </div>
+            </div>
         </div>
     </header>
     <div class="container">
@@ -33,6 +45,9 @@
         <a href="index.html">← Back to Home</a>
     </div>
     <script src="api.js"></script>
+    <script src="imageModal.js"></script>
+    <script src="share.js"></script>
+    <script src="mobile-menu.js"></script>
     <script src="master.js"></script>
 </body>
 </html>

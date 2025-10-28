@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Management - Virtual.Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="fb-header">
+        <div class="fb-header-content">
+            <div class="header-main">
+                <span class="fb-logo">Virtual.Market - Ads</span>
+                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
+            </div>
+            <div class="desktop-nav">
+                <a href="index.html" class="nav-link">← Back to Site</a>
+            </div>
+            <div id="mobileDropdown" class="mobile-dropdown">
+                <div class="mobile-nav-links">
+                    <a href="index.html" class="mobile-nav-link">← Back to Site</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h2>Advertisement Management</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div>
+                <h3>Add New Advertisement</h3>
+                <form id="adForm">
+                    <label for="adPosition">Ad Position</label>
+                    <select id="adPosition" required>
+                        <option value="">Select Position</option>
+                        <option value="header-banner">Header Banner</option>
+                        <option value="sidebar-top">Sidebar Top</option>
+                        <option value="sidebar-bottom">Sidebar Bottom</option>
+                        <option value="content-top">Content Top</option>
+                        <option value="content-middle">Content Middle</option>
+                        <option value="content-bottom">Content Bottom</option>
+                    </select>
+                    
+                    <label for="adTitle">Ad Title</label>
+                    <input type="text" id="adTitle" required>
+                    
+                    <label for="adImage">Image URL</label>
+                    <input type="url" id="adImage" required placeholder="https://example.com/image.jpg">
+                    
+                    <label for="adLink">Click URL</label>
+                    <input type="url" id="adLink" required placeholder="https://example.com">
+                    
+                    <button type="submit">Add Advertisement</button>
+                </form>
+            </div>
+            
+            <div>
+                <h3>Current Advertisements</h3>
+                <div id="adsList"></div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <h3>Ad Performance</h3>
+            <div id="adStats"></div>
+        </div>
+    </div>
+    
+    <script src="ad-manager.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const adForm = document.getElementById('adForm');
+            const adsList = document.getElementById('adsList');
+            const adStats = document.getElementById('adStats');
+            
+            function renderAdsList() {
+                adsList.innerHTML = '';
+                AdManager.ads.forEach(ad => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;';
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${ad.title}</strong><br>
+                                <small>Position: ${ad.position}</small><br>
+                                <small>Views: ${ad.views} | Clicks: ${ad.clicks}</small>
+                            </div>
+                            <div>
+                                <button onclick="toggleAd('${ad.id}')" style="margin-right: 0.5rem;">
+                                    ${ad.active ? 'Disable' : 'Enable'}
+                                </button>
+                                <button onclick="removeAd('${ad.id}')" style="background: #ef4444;">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                    adsList.appendChild(div);
+                });
+            }
+            
+            function renderStats() {
+                const totalViews = AdManager.ads.reduce((sum, ad) => sum + ad.views, 0);
+                const totalClicks = AdManager.ads.reduce((sum, ad) => sum + ad.clicks, 0);
+                const ctr = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : 0;
+                
+                adStats.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #2563eb;">${totalViews}</div>
+                            <div>Total Views</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #10b981;">${totalClicks}</div>
+                            <div>Total Clicks</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #f59e0b;">${ctr}%</div>
+                            <div>Click Rate</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            adForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const position = document.getElementById('adPosition').value;
+                const title = document.getElementById('adTitle').value;
+                const imageUrl = document.getElementById('adImage').value;
+                const link = document.getElementById('adLink').value;
+                
+                AdManager.addAd(position, imageUrl, link, title);
+                adForm.reset();
+                renderAdsList();
+                renderStats();
+                alert('Advertisement added successfully!');
+            });
+            
+            window.toggleAd = function(adId) {
+                const ad = AdManager.ads.find(a => a.id === adId);
+                if (ad) {
+                    ad.active = !ad.active;
+                    AdManager.saveAds();
+                    renderAdsList();
+                }
+            };
+            
+            window.removeAd = function(adId) {
+                if (confirm('Remove this advertisement?')) {
+                    AdManager.ads = AdManager.ads.filter(a => a.id !== adId);
+                    AdManager.saveAds();
+                    renderAdsList();
+                    renderStats();
+                }
+            };
+            
+            renderAdsList();
+            renderStats();
+        });
+    </script>
+</body>
+</html>

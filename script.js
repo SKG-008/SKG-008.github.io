@@ -92,10 +92,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateUI() {
         currentUser = localStorage.getItem("loggedInUser");
         if (currentUser) {
-            displayUser.textContent = "@Welcome, " + currentUser;
+            displayUser.textContent = currentUser;
             logoutBtn.style.display = "inline-block";
             if (loginForm) loginForm.style.display = "none";
             if (masterPageBtn) masterPageBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
+            const adminPageBtn = document.getElementById("adminPageBtn");
+            if (adminPageBtn) adminPageBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
+            const adAdminBtn = document.getElementById("adAdminBtn");
+            if (adAdminBtn) adAdminBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
             if (addListingLink) addListingLink.style.display = "inline-block";
             if (myListingsLink) myListingsLink.style.display = "inline-block";
             if (bookmarksLink) bookmarksLink.style.display = "inline-block";
@@ -104,6 +108,10 @@ document.addEventListener("DOMContentLoaded", () => {
             logoutBtn.style.display = "none";
             if (loginForm) loginForm.style.display = "flex";
             if (masterPageBtn) masterPageBtn.style.display = "none";
+            const adminPageBtn = document.getElementById("adminPageBtn");
+            if (adminPageBtn) adminPageBtn.style.display = "none";
+            const adAdminBtn = document.getElementById("adAdminBtn");
+            if (adAdminBtn) adAdminBtn.style.display = "none";
             if (addListingLink) addListingLink.style.display = "none";
             if (myListingsLink) myListingsLink.style.display = "none";
             if (bookmarksLink) bookmarksLink.style.display = "none";
@@ -283,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Images (show first image, or placeholder)
             if (listing.images && Array.isArray(listing.images) && listing.images.length > 0) {
-                html += `<img src="${listing.images[0]}" alt="Listing Image">`;
+                html += `<img src="${listing.images[0]}" alt="Listing Image" onclick="openImageModal('${listing.images[0]}', 0, ${JSON.stringify(listing.images).replace(/"/g, '&quot;')});event.stopPropagation();" style="cursor:pointer;">`;
             } else {
                 html += `<div class="no-image-text">No Pictures to Display</div>`;
             }
@@ -320,6 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<button class="bookmark-btn${isMarked ? ' in-bookmarks' : ''}" onclick="toggleBookmark('${listingId}', this);event.stopPropagation();">
                 ${isMarked ? 'Bookmarked' : 'Bookmark'}
             </button>`;
+            html += `<button onclick="shareListing(${JSON.stringify(listing).replace(/"/g, '&quot;')});event.stopPropagation();" style="background:#1877f2;color:#fff;border:none;border-radius:4px;padding:4px 12px;cursor:pointer;margin-left:8px;">Share</button>`;
             html += `</div>`; // .actions
             html += `</div>`; // .listing-details
             div.innerHTML = html;

@@ -11,14 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function displayBookmarks() {
+        if (!currentUser) {
+            bookmarksContainer.innerHTML = "<div style='text-align:center;padding:2rem;'><h2>Login Required</h2><p>Please log in to view your bookmarks.</p><a href='index.html'>← Back to Home</a></div>";
+            return;
+        }
+        
         let listings = await ListingsAPI.getListings();
         let bookmarks = getBookmarks();
 
         bookmarksContainer.innerHTML = "";
-        if (!currentUser) {
-            bookmarksContainer.innerHTML = "<p>Please log in to view your bookmarks.</p>";
-            return;
-        }
         if (bookmarks.length === 0) {
             bookmarksContainer.innerHTML = "<p>You have no bookmarks.</p>";
             return;

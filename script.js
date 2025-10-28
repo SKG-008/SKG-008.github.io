@@ -63,8 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set Add Listing link to pass mode and always open add form
     if (addListingLink) {
         addListingLink.href = "listing.html?mode=" + mode;
-        addListingLink.style.display = "inline-block";
         addListingLink.onclick = function (e) {
+            const currentUser = localStorage.getItem('loggedInUser');
+            if (!currentUser) {
+                e.preventDefault();
+                alert('Please log in to add listings.');
+                return false;
+            }
             localStorage.removeItem("selectedListing");
         };
     }

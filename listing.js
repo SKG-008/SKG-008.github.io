@@ -16,9 +16,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const isView = urlParams.has("view");
     const formContainer = document.getElementById("listingFormContainer");
     const fullListingContainer = document.getElementById("fullListing");
+    const currentUser = localStorage.getItem('loggedInUser');
 
-    // Show add form if not in view mode and no selectedListing
+    // Show add form if not in view mode and user is logged in
     if (formContainer && !isView) {
+        if (!currentUser) {
+            formContainer.innerHTML = '<div style="text-align:center;padding:2rem;"><h2>Login Required</h2><p>Please log in to add listings.</p><a href="index.html">← Back to Home</a></div>';
+            return;
+        }
         localStorage.removeItem("selectedListing");
         let formHtml = `
             <h2>Add Property Listing</h2>

@@ -9,13 +9,6 @@ function createStandardHeader(pageTitle = '') {
             </div>
             
             <div class="desktop-nav">
-                <form id="loginForm" class="fb-auth">
-                    <input type="text" id="username" placeholder="Username" required />
-                    <input type="password" id="password" placeholder="Password" required />
-                    <button type="submit" id="loginBtn">Login</button>
-                    <button type="button" id="registerBtn">Register</button>
-                </form>
-                <span id="displayUser" class="fb-user"></span>
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="listing.html" id="addListingLink" class="nav-link">Add Listing</a>
                 <a href="mylistings.html" id="myListingsLink" class="nav-link">My Listings</a>
@@ -23,6 +16,13 @@ function createStandardHeader(pageTitle = '') {
                 <a href="master.html" id="masterPageBtn" class="admin-link">Master</a>
                 <a href="admin.html" id="adminPageBtn" class="admin-link">Admin</a>
                 <a href="ad-admin.html" id="adAdminBtn" class="admin-link">Ads</a>
+                <form id="loginForm" class="fb-auth">
+                    <input type="text" id="username" placeholder="Username" required />
+                    <input type="password" id="password" placeholder="Password" required />
+                    <button type="submit" id="loginBtn">Login</button>
+                    <button type="button" id="registerBtn">Register</button>
+                </form>
+                <span id="displayUser" class="fb-user"></span>
                 <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
             

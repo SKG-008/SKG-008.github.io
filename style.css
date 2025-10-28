@@ -349,10 +349,18 @@ body {
 }
 
 /* Main Content */
+.main-content {
+    min-height: 400px;
+}
+
 h1, h2 {
     color: var(--dark);
     font-weight: 600;
     margin-bottom: 1.5rem;
+}
+
+#listingsContainer {
+    margin-top: 1rem;
 }
 
 /* Property Cards */
@@ -551,18 +559,7 @@ form button {
     color: var(--secondary);
 }
 
-/* Show/hide elements based on login state */
-.nav-link {
-    display: none;
-}
-
-.admin-link {
-    display: none;
-}
-
-.logout-btn {
-    display: none;
-}
+/* Authentication visibility - handled by JavaScript */
 
 /* Mobile Responsive */
 @media (max-width: 768px) {

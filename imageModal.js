@@ -1,101 +1,109 @@
 // Image modal functionality
-function openImageModal(imageSrc, currentIndex, allImages) {
-    const images = JSON.parse(allImages.replace(/&quot;/g, '"'));
-    
+function openImageModal(imageSrc, currentIndex = 0, allImages = []) {
     const modal = document.createElement('div');
+    modal.className = 'image-modal';
     modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: rgba(0,0,0,0.9); z-index: 2000; display: flex; 
-        align-items: center; justify-content: center; flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        cursor: pointer;
     `;
     
     const img = document.createElement('img');
     img.src = imageSrc;
     img.style.cssText = `
-        max-width: 90%; max-height: 80%; object-fit: contain; 
-        border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 8px;
     `;
-    
-    const controls = document.createElement('div');
-    controls.style.cssText = `
-        display: flex; gap: 20px; margin-top: 20px; align-items: center;
-    `;
-    
-    if (images.length > 1) {
-        const prevBtn = document.createElement('button');
-        prevBtn.textContent = '← Previous';
-        prevBtn.style.cssText = `
-            background: #1877f2; color: white; border: none; padding: 10px 20px; 
-            border-radius: 5px; cursor: pointer; font-size: 16px;
-        `;
-        prevBtn.onclick = () => {
-            const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
-            img.src = images[newIndex];
-            currentIndex = newIndex;
-            counter.textContent = `${currentIndex + 1} / ${images.length}`;
-        };
-        
-        const nextBtn = document.createElement('button');
-        nextBtn.textContent = 'Next →';
-        nextBtn.style.cssText = `
-            background: #1877f2; color: white; border: none; padding: 10px 20px; 
-            border-radius: 5px; cursor: pointer; font-size: 16px;
-        `;
-        nextBtn.onclick = () => {
-            const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
-            img.src = images[newIndex];
-            currentIndex = newIndex;
-            counter.textContent = `${currentIndex + 1} / ${images.length}`;
-        };
-        
-        const counter = document.createElement('span');
-        counter.textContent = `${currentIndex + 1} / ${images.length}`;
-        counter.style.cssText = 'color: white; font-size: 16px; font-weight: bold;';
-        
-        controls.appendChild(prevBtn);
-        controls.appendChild(counter);
-        controls.appendChild(nextBtn);
-    }
     
     const closeBtn = document.createElement('button');
-    closeBtn.textContent = 'Close';
+    closeBtn.innerHTML = '×';
     closeBtn.style.cssText = `
-        background: #666; color: white; border: none; padding: 10px 20px; 
-        border-radius: 5px; cursor: pointer; font-size: 16px;
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 40px;
+        cursor: pointer;
+        z-index: 1001;
     `;
-    closeBtn.onclick = () => document.body.removeChild(modal);
-    
-    controls.appendChild(closeBtn);
     
     modal.appendChild(img);
-    modal.appendChild(controls);
+    modal.appendChild(closeBtn);
     
-    modal.onclick = (e) => {
-        if (e.target === modal) document.body.removeChild(modal);
-    };
+    // Navigation for multiple images
+    if (Array.isArray(allImages) && allImages.length > 1) {
+        let index = currentIndex;
+        
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = '‹';
+        prevBtn.style.cssText = `
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 30px;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 50%;
+        `;
+        
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = '›';
+        nextBtn.style.cssText = `
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 30px;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 50%;
+        `;
+        
+        prevBtn.onclick = (e) => {
+            e.stopPropagation();
+            index = index > 0 ? index - 1 : allImages.length - 1;
+            img.src = allImages[index];
+        };
+        
+        nextBtn.onclick = (e) => {
+            e.stopPropagation();
+            index = index < allImages.length - 1 ? index + 1 : 0;
+            img.src = allImages[index];
+        };
+        
+        modal.appendChild(prevBtn);
+        modal.appendChild(nextBtn);
+    }
     
-    // Keyboard navigation
-    const handleKeyPress = (e) => {
-        if (e.key === 'Escape') {
-            document.body.removeChild(modal);
-            document.removeEventListener('keydown', handleKeyPress);
-        } else if (e.key === 'ArrowLeft' && images.length > 1) {
-            const newIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1;
-            img.src = images[newIndex];
-            currentIndex = newIndex;
-            if (controls.querySelector('span')) {
-                controls.querySelector('span').textContent = `${currentIndex + 1} / ${images.length}`;
-            }
-        } else if (e.key === 'ArrowRight' && images.length > 1) {
-            const newIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0;
-            img.src = images[newIndex];
-            currentIndex = newIndex;
-            if (controls.querySelector('span')) {
-                controls.querySelector('span').textContent = `${currentIndex + 1} / ${images.length}`;
-            }
-        }
-    };
+    // Close modal
+    const closeModal = () => document.body.removeChild(modal);
+    modal.onclick = closeModal;
+    closeBtn.onclick = closeModal;
     
-    document.addEventListener('keydown', handleKeyPress);
+    // Prevent image click from closing modal
+    img.onclick = (e) => e.stopPropagation();
+    
     document.body.appendChild(modal);
 }
+
+// Make function globally available
+window.openImageModal = openImageModal;

@@ -77,7 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('loggedInUser', username);
                 syncMobileAuth();
                 // Also update desktop UI
-                if (window.updateUI) window.updateUI();
+                if (window.updateAuthUI) window.updateAuthUI(username);
+                if (window.displayListings) window.displayListings();
                 mobileDropdown.classList.remove('show');
                 mobileMenuBtn.textContent = '☰';
             } else {
@@ -116,7 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('loggedInUser');
             syncMobileAuth();
             // Also update desktop UI
-            if (window.updateUI) window.updateUI();
+            if (window.updateAuthUI) window.updateAuthUI(null);
+            if (window.displayListings) window.displayListings();
             mobileDropdown.classList.remove('show');
             mobileMenuBtn.textContent = '☰';
         });

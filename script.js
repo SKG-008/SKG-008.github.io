@@ -91,66 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateUI() {
         currentUser = localStorage.getItem("loggedInUser");
-        if (currentUser) {
-            displayUser.textContent = currentUser;
-            logoutBtn.style.display = "inline-block";
-            if (loginForm) loginForm.style.display = "none";
-            if (masterPageBtn) masterPageBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
-            const adminPageBtn = document.getElementById("adminPageBtn");
-            if (adminPageBtn) adminPageBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
-            const adAdminBtn = document.getElementById("adAdminBtn");
-            if (adAdminBtn) adAdminBtn.style.display = (currentUser === "MasterLogin") ? "inline-block" : "none";
-            if (addListingLink) addListingLink.style.display = "inline-block";
-            if (myListingsLink) myListingsLink.style.display = "inline-block";
-            if (bookmarksLink) bookmarksLink.style.display = "inline-block";
-        } else {
-            displayUser.textContent = "";
-            logoutBtn.style.display = "none";
-            if (loginForm) loginForm.style.display = "flex";
-            if (masterPageBtn) masterPageBtn.style.display = "none";
-            const adminPageBtn = document.getElementById("adminPageBtn");
-            if (adminPageBtn) adminPageBtn.style.display = "none";
-            const adAdminBtn = document.getElementById("adAdminBtn");
-            if (adAdminBtn) adAdminBtn.style.display = "none";
-            if (addListingLink) addListingLink.style.display = "none";
-            if (myListingsLink) myListingsLink.style.display = "none";
-            if (bookmarksLink) bookmarksLink.style.display = "none";
+        if (window.updateAuthUI) {
+            window.updateAuthUI(currentUser);
         }
         displayListings();
     }
+    
+    // Make updateUI globally available for header template
+    window.updateUI = updateUI;
 
-    if (loginForm) {
-        loginForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value;
-            if (users[username] && users[username] === password) {
-                localStorage.setItem("loggedInUser", username);
-                updateUI();
-            } else {
-                alert("Invalid credentials");
-            }
-        });
-    }
-
-    if (registerBtn) {
-        registerBtn.addEventListener("click", function () {
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value;
-            if (!username || !password) return alert("Fill in both fields");
-            if (users[username]) return alert("Username already taken");
-            users[username] = password;
-            localStorage.setItem("users", JSON.stringify(users));
-            alert("Registered! Now log in.");
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", function () {
-            localStorage.removeItem("loggedInUser");
-            updateUI();
-        });
-    }
+    // Authentication is now handled by header-template.js
 
     // --- Dropdown Filter Menu Logic ---
     if (toggleFilterBtn && filterForm) {
@@ -303,9 +253,9 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<div class="listing-title">${listing.address || ""}</div>`;
             // Price
             if (mode === "rent") {
-                html += `<div class="listing-price">${Number(listing.value).toLocaleString()} / week</div>`;
+                html += `<div class="listing-price">$${Number(listing.value).toLocaleString()} / week</div>`;
             } else {
-                html += `<div class="listing-price">${Number(listing.value).toLocaleString()}</div>`;
+                html += `<div class="listing-price">$${Number(listing.value).toLocaleString()}</div>`;
             }
             // Meta
             html += `<div class="listing-meta">Bedrooms: ${listing.bedrooms || "-"} | Bathrooms: ${listing.bathrooms || "-"}</div>`;
@@ -336,6 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Make displayListings globally available
+    window.displayListings = displayListings;
+    
     // Initial UI update
     updateUI();
 });

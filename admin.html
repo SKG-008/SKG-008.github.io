@@ -7,22 +7,7 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header class="fb-header">
-        <div class="fb-header-content">
-            <div class="header-main">
-                <span class="fb-logo">Virtual.Market - Admin</span>
-                <button id="mobileMenuBtn" class="mobile-menu-btn">☰</button>
-            </div>
-            <div class="desktop-nav">
-                <a href="index.html" class="nav-link">Home</a>
-            </div>
-            <div id="mobileDropdown" class="mobile-dropdown">
-                <div class="mobile-nav-links">
-                    <a href="index.html" class="mobile-nav-link">Home</a>
-                </div>
-            </div>
-        </div>
-    </header>
+    <div id="standardHeader" data-title="Admin"></div>
     <div class="container">
         <h2>Admin Tools</h2>
         
@@ -58,6 +43,7 @@
     
     <script src="api.js"></script>
     <script src="sync.js"></script>
+    <script src="header-template.js"></script>
     <script src="mobile-menu.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

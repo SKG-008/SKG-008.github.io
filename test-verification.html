@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Verification Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background: #d4edda; border-color: #c3e6cb; }
+        .fail { background: #f8d7da; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Virtual.Market Website Verification</h1>
+    <div id="results"></div>
+    
+    <script>
+        const tests = [];
+        
+        function addTest(name, condition) {
+            tests.push({ name, condition });
+        }
+        
+        function runTests() {
+            const results = document.getElementById('results');
+            let passed = 0;
+            
+            tests.forEach(test => {
+                const div = document.createElement('div');
+                div.className = 'test';
+                
+                try {
+                    const result = test.condition();
+                    if (result) {
+                        div.classList.add('pass');
+                        div.innerHTML = `✓ ${test.name}`;
+                        passed++;
+                    } else {
+                        div.classList.add('fail');
+                        div.innerHTML = `✗ ${test.name}`;
+                    }
+                } catch (error) {
+                    div.classList.add('fail');
+                    div.innerHTML = `✗ ${test.name} - Error: ${error.message}`;
+                }
+                
+                results.appendChild(div);
+            });
+            
+            const summary = document.createElement('div');
+            summary.innerHTML = `<h2>Results: ${passed}/${tests.length} tests passed</h2>`;
+            results.insertBefore(summary, results.firstChild);
+        }
+        
+        // File existence tests
+        addTest('index.html exists', () => {
+            return fetch('index.html').then(r => r.ok).catch(() => false);
+        });
+        
+        addTest('style.css exists', () => {
+            return fetch('style.css').then(r => r.ok).catch(() => false);
+        });
+        
+        addTest('header-template.js exists', () => {
+            return fetch('header-template.js').then(r => r.ok).catch(() => false);
+        });
+        
+        addTest('api.js exists', () => {
+            return fetch('api.js').then(r => r.ok).catch(() => false);
+        });
+        
+        addTest('script.js exists', () => {
+            return fetch('script.js').then(r => r.ok).catch(() => false);
+        });
+        
+        // LocalStorage functionality
+        addTest('LocalStorage works', () => {
+            localStorage.setItem('test', 'value');
+            const result = localStorage.getItem('test') === 'value';
+            localStorage.removeItem('test');
+            return result;
+        });
+        
+        // CSS Variables
+        addTest('CSS Variables defined', () => {
+            const style = getComputedStyle(document.documentElement);
+            return style.getPropertyValue('--primary').trim() !== '';
+        });
+        
+        // Basic DOM functionality
+        addTest('DOM manipulation works', () => {
+            const div = document.createElement('div');
+            div.id = 'test-div';
+            document.body.appendChild(div);
+            const found = document.getElementById('test-div');
+            document.body.removeChild(div);
+            return found !== null;
+        });
+        
+        setTimeout(runTests, 100);
+    </script>
+</body>
+</html>

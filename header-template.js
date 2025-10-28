@@ -51,11 +51,129 @@ function createStandardHeader(pageTitle = '') {
     </header>`;
 }
 
-// Initialize standard header
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize standard header immediately
+function initializeHeader() {
     const headerContainer = document.getElementById('standardHeader');
     if (headerContainer) {
         const pageTitle = headerContainer.getAttribute('data-title') || '';
         headerContainer.innerHTML = createStandardHeader(pageTitle);
+        
+        // Initialize authentication after header is created
+        setTimeout(initializeAuth, 100);
     }
-});
+}
+
+// Initialize authentication
+function initializeAuth() {
+    // Ensure MasterLogin user exists
+    let users = JSON.parse(localStorage.getItem('users') || '{}');
+    if (!users['MasterLogin']) {
+        users['MasterLogin'] = 'MasterLogin';
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+    
+    const currentUser = localStorage.getItem('loggedInUser');
+    updateAuthUI(currentUser);
+    setupAuthListeners();
+}
+
+// Update authentication UI
+function updateAuthUI(currentUser) {
+    const displayUser = document.getElementById('displayUser');
+    const loginForm = document.getElementById('loginForm');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const masterPageBtn = document.getElementById('masterPageBtn');
+    const adminPageBtn = document.getElementById('adminPageBtn');
+    const adAdminBtn = document.getElementById('adAdminBtn');
+    const addListingLink = document.getElementById('addListingLink');
+    const myListingsLink = document.getElementById('myListingsLink');
+    const bookmarksLink = document.getElementById('bookmarksLink');
+    
+    if (currentUser) {
+        if (displayUser) displayUser.textContent = currentUser;
+        if (loginForm) loginForm.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        
+        const isMaster = currentUser === 'MasterLogin';
+        if (masterPageBtn) masterPageBtn.style.display = isMaster ? 'inline-block' : 'none';
+        if (adminPageBtn) adminPageBtn.style.display = isMaster ? 'inline-block' : 'none';
+        if (adAdminBtn) adAdminBtn.style.display = isMaster ? 'inline-block' : 'none';
+        
+        if (addListingLink) addListingLink.style.display = 'inline-block';
+        if (myListingsLink) myListingsLink.style.display = 'inline-block';
+        if (bookmarksLink) bookmarksLink.style.display = 'inline-block';
+    } else {
+        if (displayUser) displayUser.textContent = '';
+        if (loginForm) loginForm.style.display = 'flex';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (masterPageBtn) masterPageBtn.style.display = 'none';
+        if (adminPageBtn) adminPageBtn.style.display = 'none';
+        if (adAdminBtn) adAdminBtn.style.display = 'none';
+        if (addListingLink) addListingLink.style.display = 'none';
+        if (myListingsLink) myListingsLink.style.display = 'none';
+        if (bookmarksLink) bookmarksLink.style.display = 'none';
+    }
+}
+
+// Setup authentication event listeners
+function setupAuthListeners() {
+    const loginForm = document.getElementById('loginForm');
+    const registerBtn = document.getElementById('registerBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[username] && users[username] === password) {
+                localStorage.setItem('loggedInUser', username);
+                updateAuthUI(username);
+                if (window.displayListings) window.displayListings();
+            } else {
+                alert('Invalid credentials');
+            }
+        });
+    }
+    
+    if (registerBtn) {
+        registerBtn.addEventListener('click', function() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (!username || !password) {
+                alert('Fill in both fields');
+                return;
+            }
+            if (users[username]) {
+                alert('Username already taken');
+                return;
+            }
+            
+            users[username] = password;
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Registered! Now log in.');
+        });
+    }
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('loggedInUser');
+            updateAuthUI(null);
+            if (window.displayListings) window.displayListings();
+        });
+    }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeHeader);
+} else {
+    initializeHeader();
+}
+
+// Make functions globally available
+window.updateAuthUI = updateAuthUI;

@@ -175,5 +175,28 @@ if (document.readyState === 'loading') {
     initializeHeader();
 }
 
+// Ensure header stays consistent across page navigation
+window.addEventListener('beforeunload', function() {
+    // Preserve auth state
+    const currentUser = localStorage.getItem('loggedInUser');
+    if (currentUser) {
+        sessionStorage.setItem('tempUser', currentUser);
+    }
+});
+
+window.addEventListener('load', function() {
+    // Restore auth state if needed
+    const tempUser = sessionStorage.getItem('tempUser');
+    if (tempUser && !localStorage.getItem('loggedInUser')) {
+        localStorage.setItem('loggedInUser', tempUser);
+        sessionStorage.removeItem('tempUser');
+    }
+    // Reinitialize header
+    if (document.getElementById('standardHeader')) {
+        initializeHeader();
+    }
+});
+
 // Make functions globally available
 window.updateAuthUI = updateAuthUI;
+window.initializeHeader = initializeHeader;

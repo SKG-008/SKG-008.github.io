@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functionality Test</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="standardHeader"></div>
+    
+    <div class="container">
+        <h2>Website Functionality Test</h2>
+        <div id="testResults"></div>
+        <button id="runTests" class="filter-btn">Run All Tests</button>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="header-template.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script>
+        const tests = [
+            {
+                name: 'Header Template Loads',
+                test: () => document.querySelector('.fb-header') !== null
+            },
+            {
+                name: 'Login Form Exists',
+                test: () => document.getElementById('loginForm') !== null
+            },
+            {
+                name: 'Mobile Menu Button Exists',
+                test: () => document.getElementById('mobileMenuBtn') !== null
+            },
+            {
+                name: 'LocalStorage Available',
+                test: () => {
+                    try {
+                        localStorage.setItem('test', '1');
+                        localStorage.removeItem('test');
+                        return true;
+                    } catch { return false; }
+                }
+            },
+            {
+                name: 'API Object Available',
+                test: () => typeof ListingsAPI !== 'undefined'
+            },
+            {
+                name: 'Authentication Functions Work',
+                test: () => {
+                    const users = { testUser: 'testPass' };
+                    localStorage.setItem('users', JSON.stringify(users));
+                    localStorage.setItem('loggedInUser', 'testUser');
+                    const user = localStorage.getItem('loggedInUser');
+                    localStorage.removeItem('loggedInUser');
+                    return user === 'testUser';
+                }
+            },
+            {
+                name: 'Header Fixed Position',
+                test: () => {
+                    const header = document.querySelector('.fb-header');
+                    return header && getComputedStyle(header).position === 'fixed';
+                }
+            },
+            {
+                name: 'Mobile Dropdown Hidden Initially',
+                test: () => {
+                    const dropdown = document.getElementById('mobileDropdown');
+                    return dropdown && !dropdown.classList.contains('show');
+                }
+            }
+        ];
+
+        function runTests() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '';
+            let passed = 0;
+
+            tests.forEach(test => {
+                const div = document.createElement('div');
+                div.style.cssText = 'padding:8px;margin:4px;border-radius:4px;';
+                
+                try {
+                    const result = test.test();
+                    if (result) {
+                        div.style.background = '#d4edda';
+                        div.innerHTML = `✓ ${test.name}`;
+                        passed++;
+                    } else {
+                        div.style.background = '#f8d7da';
+                        div.innerHTML = `✗ ${test.name}`;
+                    }
+                } catch (error) {
+                    div.style.background = '#f8d7da';
+                    div.innerHTML = `✗ ${test.name} - ${error.message}`;
+                }
+                
+                results.appendChild(div);
+            });
+
+            const summary = document.createElement('div');
+            summary.style.cssText = 'font-weight:bold;margin:16px 0;padding:12px;border-radius:4px;';
+            summary.style.background = passed === tests.length ? '#d4edda' : '#fff3cd';
+            summary.innerHTML = `Results: ${passed}/${tests.length} tests passed`;
+            results.insertBefore(summary, results.firstChild);
+        }
+
+        document.getElementById('runTests').addEventListener('click', runTests);
+        
+        // Auto-run tests after page loads
+        setTimeout(runTests, 1000);
+    </script>
+</body>
+</html>

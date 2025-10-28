@@ -75,6 +75,11 @@ function initializeAuth() {
     const currentUser = localStorage.getItem('loggedInUser');
     updateAuthUI(currentUser);
     setupAuthListeners();
+    
+    // Also update mobile UI
+    if (window.syncMobileAuth) {
+        window.syncMobileAuth();
+    }
 }
 
 // Update authentication UI
@@ -131,6 +136,8 @@ function setupAuthListeners() {
             if (users[username] && users[username] === password) {
                 localStorage.setItem('loggedInUser', username);
                 updateAuthUI(username);
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
                 if (window.displayListings) window.displayListings();
             } else {
                 alert('Invalid credentials');
@@ -155,6 +162,8 @@ function setupAuthListeners() {
             
             users[username] = password;
             localStorage.setItem('users', JSON.stringify(users));
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
             alert('Registered! Now log in.');
         });
     }
@@ -163,6 +172,11 @@ function setupAuthListeners() {
         logoutBtn.addEventListener('click', function() {
             localStorage.removeItem('loggedInUser');
             updateAuthUI(null);
+            // Clear form fields
+            const usernameField = document.getElementById('username');
+            const passwordField = document.getElementById('password');
+            if (usernameField) usernameField.value = '';
+            if (passwordField) passwordField.value = '';
             if (window.displayListings) window.displayListings();
         });
     }

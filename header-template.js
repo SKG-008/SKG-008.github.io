@@ -34,12 +34,12 @@ function createStandardHeader(pageTitle = '') {
                 <div class="mobile-user-info">
                     <span id="mobileDisplayUser"></span>
                 </div>
-                <form id="mobileLoginForm" class="mobile-auth">
+                <div id="mobileLoginForm" class="mobile-auth">
                     <input type="text" id="mobileUsername" placeholder="Username" required />
                     <input type="password" id="mobilePassword" placeholder="Password" required />
-                    <button type="submit" id="mobileLoginBtn">Login</button>
+                    <button type="button" id="mobileLoginBtn">Login</button>
                     <button type="button" id="mobileRegisterBtn">Register</button>
-                </form>
+                </div>
                 <div class="mobile-nav-links">
                     <a href="index.html" class="mobile-nav-link">Home</a>
                     <a href="listing.html" id="mobileAddListingLink" class="mobile-nav-link">Add Listing</a>
@@ -76,6 +76,9 @@ function initializeHeader() {
 
 // Initialize authentication
 function initializeAuth() {
+    // Load users from GitHub first
+    loadUsersFromGitHub();
+    
     // Ensure MasterLogin user exists
     let users = JSON.parse(localStorage.getItem('users') || '{}');
     if (!users['MasterLogin']) {
@@ -406,7 +409,30 @@ function updateMobileAuthUI(currentUser) {
     }
 }
 
+// Load users from GitHub
+async function loadUsersFromGitHub() {
+    try {
+        const response = await fetch('data/users.json');
+        if (response.ok) {
+            const githubUsers = await response.json();
+            // Merge with local users
+            const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+            const mergedUsers = {...githubUsers, ...localUsers};
+            localStorage.setItem('users', JSON.stringify(mergedUsers));
+            localStorage.setItem('githubUsers', JSON.stringify(githubUsers));
+        }
+    } catch (error) {
+        console.log('GitHub users sync not available');
+        // Use cached GitHub users if available
+        const cachedUsers = JSON.parse(localStorage.getItem('githubUsers') || '{}');
+        const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        const mergedUsers = {...cachedUsers, ...localUsers};
+        localStorage.setItem('users', JSON.stringify(mergedUsers));
+    }
+}
+
 // Make functions globally available
 window.updateAuthUI = updateAuthUI;
 window.updateMobileAuthUI = updateMobileAuthUI;
 window.initializeHeader = initializeHeader;
+window.loadUsersFromGitHub = loadUsersFromGitHub;

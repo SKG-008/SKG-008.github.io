@@ -74,10 +74,28 @@
             if (savedRepo) repoInput.value = savedRepo;
             if (savedBranch) branchInput.value = savedBranch;
             
+            // Export users to GitHub
+            function exportUsers() {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                const dataStr = JSON.stringify(users, null, 2);
+                const blob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'users.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+            
             // Display all users
             function displayUsers() {
                 const users = JSON.parse(localStorage.getItem('users') || '{}');
-                usersList.innerHTML = '';
+                usersList.innerHTML = `
+                    <div style="margin-bottom:1rem;">
+                        <button onclick="exportUsers()" class="filter-btn">Export Users to GitHub</button>
+                        <small style="display:block;margin-top:5px;color:#666;">Download users.json and upload to GitHub data/ folder</small>
+                    </div>
+                `;
                 
                 Object.entries(users).forEach(([username, password]) => {
                     const userDiv = document.createElement('div');
@@ -119,6 +137,9 @@
             });
             
             displayUsers();
+            
+            // Make export function global
+            window.exportUsers = exportUsers;
             
             // Auto-sync functionality
             document.getElementById('autoSyncBtn').addEventListener('click', function() {

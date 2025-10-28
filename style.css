@@ -228,6 +228,17 @@ body {
 }
 
 .mobile-auth input {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.mobile-auth button {
+    -webkit-appearance: none;
+    appearance: none;
+    touch-action: manipulation;
+}
+
+.mobile-auth input {
     padding: 0.75rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);

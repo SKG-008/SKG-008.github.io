@@ -10,6 +10,8 @@ const ListingsAPI = {
         const response = await fetch('data/listings.json');
         if (response.ok) {
           const githubListings = await response.json();
+          // Store GitHub listings locally for offline access
+          localStorage.setItem('githubListings', JSON.stringify(githubListings));
           // Merge with localStorage
           const localListings = JSON.parse(localStorage.getItem('listings') || '[]');
           const merged = [...githubListings, ...localListings.filter(local => 
@@ -18,7 +20,14 @@ const ListingsAPI = {
           return merged;
         }
       } catch (error) {
-        console.log('GitHub sync not available, using localStorage');
+        console.log('GitHub sync not available, using cached data');
+        // Use cached GitHub data if available
+        const cachedGithub = JSON.parse(localStorage.getItem('githubListings') || '[]');
+        const localListings = JSON.parse(localStorage.getItem('listings') || '[]');
+        const merged = [...cachedGithub, ...localListings.filter(local => 
+          !cachedGithub.find(github => github.id === local.id)
+        )];
+        return merged;
       }
       // Fallback to localStorage
       return JSON.parse(localStorage.getItem('listings') || '[]');

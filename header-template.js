@@ -242,6 +242,61 @@ function initializeMobileMenuDirect() {
             }
         };
     }
+    
+    // Mobile login handler
+    const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+    if (mobileLoginBtn) {
+        mobileLoginBtn.onclick = function(e) {
+            e.preventDefault();
+            const username = document.getElementById('mobileUsername')?.value?.trim();
+            const password = document.getElementById('mobilePassword')?.value;
+            
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[username] && users[username] === password) {
+                localStorage.setItem('loggedInUser', username);
+                sessionStorage.setItem('manualLogin', 'true');
+                
+                // Update mobile UI immediately
+                const mobileDisplayUser = document.getElementById('mobileDisplayUser');
+                const mobileLoginForm = document.getElementById('mobileLoginForm');
+                const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+                
+                if (mobileDisplayUser) mobileDisplayUser.textContent = username;
+                if (mobileLoginForm) mobileLoginForm.style.display = 'none';
+                if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'block';
+                
+                // Show user links
+                const userLinks = ['mobileAddListingLink', 'mobileMyListingsLink', 'mobileBookmarksLink'];
+                userLinks.forEach(id => {
+                    const link = document.getElementById(id);
+                    if (link) link.style.display = 'block';
+                });
+                
+                // Show admin links if master
+                if (username === 'MasterLogin') {
+                    const adminLinks = ['mobileMasterPageBtn', 'mobileAdminPageBtn', 'mobileAdAdminBtn'];
+                    adminLinks.forEach(id => {
+                        const link = document.getElementById(id);
+                        if (link) link.style.display = 'block';
+                    });
+                }
+                
+                // Update desktop UI
+                if (window.updateAuthUI) window.updateAuthUI(username);
+                if (window.displayListings) window.displayListings();
+                
+                alert('Login successful!');
+            } else {
+                alert('Invalid username or password');
+            }
+        };
+    }
 }
 
 // Make functions globally available

@@ -10,10 +10,18 @@ function initializeMobileMenu() {
     
     // Remove existing listeners to prevent duplicates
     if (mobileMenuBtn && !mobileMenuBtn.hasAttribute('data-initialized')) {
-        mobileMenuBtn.addEventListener('click', function() {
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             if (mobileDropdown) {
-                mobileDropdown.classList.toggle('show');
-                this.textContent = mobileDropdown.classList.contains('show') ? '✕' : '☰';
+                const isShowing = mobileDropdown.classList.contains('show');
+                if (isShowing) {
+                    mobileDropdown.classList.remove('show');
+                    this.innerHTML = '☰';
+                } else {
+                    mobileDropdown.classList.add('show');
+                    this.innerHTML = '✕';
+                }
             }
         });
         mobileMenuBtn.setAttribute('data-initialized', 'true');
@@ -21,9 +29,11 @@ function initializeMobileMenu() {
     
     // Close menu when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.fb-header') && mobileDropdown.classList.contains('show')) {
+        const mobileDropdown = document.getElementById('mobileDropdown');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        if (mobileDropdown && mobileMenuBtn && !e.target.closest('.fb-header') && mobileDropdown.classList.contains('show')) {
             mobileDropdown.classList.remove('show');
-            if (mobileMenuBtn) mobileMenuBtn.textContent = '☰';
+            mobileMenuBtn.innerHTML = '☰';
         }
     });
     

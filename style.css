@@ -170,10 +170,15 @@ body {
     background: var(--white);
     border-top: 1px solid var(--border);
     padding: 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
 }
 
 .mobile-dropdown.show {
     display: block;
+    max-height: 500px;
+    padding: 1rem;
 }
 
 .mobile-user-info {
@@ -557,43 +562,46 @@ form button {
     display: block;
 }
 
-/* Google Ads Standard Banner Sizes */
-.ad-container[data-position="header-banner"] .ad-image {
+/* Google Ads Standard Banner Sizes - Fixed dimensions */
+.ad-container[data-position="header-banner"] {
     width: 728px;
     height: 90px;
-    object-fit: cover;
     max-width: 100%;
+    overflow: hidden;
+}
+
+.ad-container[data-position="header-banner"] .ad-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.ad-container[data-position="sidebar-top"],
+.ad-container[data-position="sidebar-bottom"] {
+    width: 300px;
+    height: 250px;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .ad-container[data-position="sidebar-top"] .ad-image,
 .ad-container[data-position="sidebar-bottom"] .ad-image {
-    width: 300px;
-    height: 250px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    max-width: 100%;
-}
-
-.ad-container[data-position="content-top"] .ad-image,
-.ad-container[data-position="content-middle"] .ad-image,
-.ad-container[data-position="content-bottom"] .ad-image {
-    width: 728px;
-    height: 90px;
-    object-fit: cover;
-    max-width: 100%;
+    object-position: center;
 }
 
 /* Mobile responsive ad sizes */
 @media (max-width: 768px) {
-    .ad-container[data-position="header-banner"] .ad-image,
-    .ad-container[data-position="content-top"] .ad-image,
-    .ad-container[data-position="content-middle"] .ad-image,
-    .ad-container[data-position="content-bottom"] .ad-image {
+    .ad-container[data-position="header-banner"] {
         width: 320px;
         height: 50px;
     }
     
-    .ad-container[data-position="sidebar-top"] .ad-image,
-    .ad-container[data-position="sidebar-bottom"] .ad-image {
+    .ad-container[data-position="sidebar-top"],
+    .ad-container[data-position="sidebar-bottom"] {
         width: 300px;
         height: 250px;
     }

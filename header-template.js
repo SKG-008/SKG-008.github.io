@@ -56,9 +56,10 @@ function createStandardHeader(pageTitle = '') {
 // Initialize standard header immediately
 function initializeHeader() {
     const headerContainer = document.getElementById('standardHeader');
-    if (headerContainer) {
+    if (headerContainer && !headerContainer.hasAttribute('data-header-loaded')) {
         const pageTitle = headerContainer.getAttribute('data-title') || '';
         headerContainer.innerHTML = createStandardHeader(pageTitle);
+        headerContainer.setAttribute('data-header-loaded', 'true');
         
         // Initialize authentication and mobile menu after header is created
         setTimeout(() => {
@@ -199,27 +200,25 @@ if (document.readyState === 'loading') {
     initializeHeader();
 }
 
-// Ensure header stays consistent across page navigation
-window.addEventListener('beforeunload', function() {
-    // Preserve auth state
-    const currentUser = localStorage.getItem('loggedInUser');
-    if (currentUser) {
-        sessionStorage.setItem('tempUser', currentUser);
+// Prevent header glitches during page transitions
+let headerInitialized = false;
+
+function ensureHeaderStability() {
+    if (!headerInitialized && document.getElementById('standardHeader')) {
+        initializeHeader();
+        headerInitialized = true;
+    }
+}
+
+// Check for header on page visibility change
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        setTimeout(ensureHeaderStability, 50);
     }
 });
 
-window.addEventListener('load', function() {
-    // Restore auth state if needed
-    const tempUser = sessionStorage.getItem('tempUser');
-    if (tempUser && !localStorage.getItem('loggedInUser')) {
-        localStorage.setItem('loggedInUser', tempUser);
-        sessionStorage.removeItem('tempUser');
-    }
-    // Reinitialize header
-    if (document.getElementById('standardHeader')) {
-        initializeHeader();
-    }
-});
+// Reinitialize on focus
+window.addEventListener('focus', ensureHeaderStability);
 
 // Make functions globally available
 window.updateAuthUI = updateAuthUI;

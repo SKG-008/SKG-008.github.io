@@ -93,12 +93,16 @@ function initializeMobileMenu() {
             
             if (users[username] && users[username] === password) {
                 localStorage.setItem('loggedInUser', username);
+                sessionStorage.setItem('manualLogin', 'true');
+                // Clear mobile form
+                document.getElementById('mobileUsername').value = '';
+                document.getElementById('mobilePassword').value = '';
                 syncMobileAuth();
                 // Also update desktop UI
                 if (window.updateAuthUI) window.updateAuthUI(username);
                 if (window.displayListings) window.displayListings();
-                mobileDropdown.classList.remove('show');
-                mobileMenuBtn.textContent = '☰';
+                if (mobileDropdown) mobileDropdown.classList.remove('show');
+                if (mobileMenuBtn) mobileMenuBtn.innerHTML = '☰';
             } else {
                 alert('Invalid credentials');
             }

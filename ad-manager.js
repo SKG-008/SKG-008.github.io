@@ -50,6 +50,22 @@ const AdManager = {
             const container = document.getElementById(`ad-${position}`);
             if (!container) return;
             
+            // Check for header banner ad first
+            if (position === 'header-banner') {
+                const bannerAd = JSON.parse(localStorage.getItem('headerBannerAd') || 'null');
+                if (bannerAd) {
+                    container.innerHTML = `
+                        <div class="ad-container" data-position="${position}">
+                            <span class="ad-label">Advertisement</span>
+                            <a href="${bannerAd.link}" target="_blank" class="ad-link">
+                                <img src="${bannerAd.image}" alt="${bannerAd.title}" class="ad-image">
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+            
             const ad = this.ads.find(a => a.position === position && a.active);
             if (ad) {
                 container.innerHTML = `

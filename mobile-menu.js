@@ -1,14 +1,22 @@
 // Mobile Menu Handler
 document.addEventListener('DOMContentLoaded', function() {
+    initializeMobileMenu();
+});
+
+// Initialize mobile menu - can be called after header loads
+function initializeMobileMenu() {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const mobileDropdown = document.getElementById('mobileDropdown');
     
-    // Toggle mobile menu
-    if (mobileMenuBtn) {
+    // Remove existing listeners to prevent duplicates
+    if (mobileMenuBtn && !mobileMenuBtn.hasAttribute('data-initialized')) {
         mobileMenuBtn.addEventListener('click', function() {
-            mobileDropdown.classList.toggle('show');
-            this.textContent = mobileDropdown.classList.contains('show') ? '✕' : '☰';
+            if (mobileDropdown) {
+                mobileDropdown.classList.toggle('show');
+                this.textContent = mobileDropdown.classList.contains('show') ? '✕' : '☰';
+            }
         });
+        mobileMenuBtn.setAttribute('data-initialized', 'true');
     }
     
     // Close menu when clicking outside
@@ -37,10 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const mobileMasterBtn = document.getElementById('mobileMasterPageBtn');
             const mobileAdminBtn = document.getElementById('mobileAdminPageBtn');
             const mobileAdAdminBtn = document.getElementById('mobileAdAdminBtn');
+            const mobileBannerAdminBtn = document.getElementById('mobileBannerAdminBtn');
             
             if (mobileMasterBtn) mobileMasterBtn.style.display = isMaster ? 'block' : 'none';
             if (mobileAdminBtn) mobileAdminBtn.style.display = isMaster ? 'block' : 'none';
             if (mobileAdAdminBtn) mobileAdAdminBtn.style.display = isMaster ? 'block' : 'none';
+            if (mobileBannerAdminBtn) mobileBannerAdminBtn.style.display = isMaster ? 'block' : 'none';
             
             // Show user links
             const mobileAddListingLink = document.getElementById('mobileAddListingLink');
@@ -129,4 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Listen for auth changes
     window.addEventListener('storage', syncMobileAuth);
+}
+
+// Make function globally available
+window.initializeMobileMenu = initializeMobileMenu;
 });

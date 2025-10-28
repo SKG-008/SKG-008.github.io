@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             div.onclick = function (e) {
                 if (e.target.tagName === "BUTTON") return;
                 localStorage.setItem("selectedListing", JSON.stringify(listing));
-                window.open("listing.html?view=1", "_blank");
+                window.location.href = "listing.html?view=1";
             };
             let html = "";
 

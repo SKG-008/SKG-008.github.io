@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Banner Manager - Virtual.Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="standardHeader" data-title="Ad Banner Manager"></div>
+    
+    <div class="container">
+        <div id="masterOnly" style="display:none;">
+            <h2>Header Banner Advertisement Manager</h2>
+            
+            <div style="margin-bottom: 2rem;">
+                <h3>Add New Banner Ad</h3>
+                <form id="bannerAdForm">
+                    <label for="adTitle">Ad Title</label>
+                    <input type="text" id="adTitle" required>
+                    
+                    <label for="adImage">Image File</label>
+                    <input type="file" id="adImage" accept="image/*" required>
+                    <div id="imagePreview" style="margin: 10px 0;"></div>
+                    
+                    <label for="adLink">Click URL</label>
+                    <input type="url" id="adLink" required placeholder="https://example.com">
+                    
+                    <button type="submit" class="filter-btn">Add Banner Ad</button>
+                </form>
+            </div>
+            
+            <div>
+                <h3>Current Banner Ad</h3>
+                <div id="currentBanner"></div>
+                <button id="removeBanner" style="background:#dc2626;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;">Remove Current Banner</button>
+            </div>
+        </div>
+        
+        <div id="accessDenied" style="text-align:center;padding:2rem;">
+            <h2>Access Denied</h2>
+            <p>Master login required to manage banner advertisements.</p>
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+
+    <script src="header-template.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = localStorage.getItem('loggedInUser');
+            const masterOnly = document.getElementById('masterOnly');
+            const accessDenied = document.getElementById('accessDenied');
+            
+            if (currentUser === 'MasterLogin') {
+                masterOnly.style.display = 'block';
+                accessDenied.style.display = 'none';
+                initializeBannerManager();
+            } else {
+                masterOnly.style.display = 'none';
+                accessDenied.style.display = 'block';
+            }
+        });
+        
+        function initializeBannerManager() {
+            const form = document.getElementById('bannerAdForm');
+            const imageInput = document.getElementById('adImage');
+            const preview = document.getElementById('imagePreview');
+            const currentBanner = document.getElementById('currentBanner');
+            const removeBtn = document.getElementById('removeBanner');
+            
+            // Image preview
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.innerHTML = `<img src="${e.target.result}" style="max-width:300px;height:auto;border:1px solid #ccc;border-radius:4px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('adTitle').value;
+                const link = document.getElementById('adLink').value;
+                const file = imageInput.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const bannerAd = {
+                            title: title,
+                            image: e.target.result,
+                            link: link,
+                            created: new Date().toISOString()
+                        };
+                        
+                        localStorage.setItem('headerBannerAd', JSON.stringify(bannerAd));
+                        alert('Banner ad added successfully!');
+                        form.reset();
+                        preview.innerHTML = '';
+                        displayCurrentBanner();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Remove banner
+            removeBtn.addEventListener('click', function() {
+                if (confirm('Remove current banner ad?')) {
+                    localStorage.removeItem('headerBannerAd');
+                    displayCurrentBanner();
+                    alert('Banner ad removed.');
+                }
+            });
+            
+            // Display current banner
+            function displayCurrentBanner() {
+                const banner = JSON.parse(localStorage.getItem('headerBannerAd') || 'null');
+                if (banner) {
+                    currentBanner.innerHTML = `
+                        <div style="border:1px solid #ccc;border-radius:8px;padding:1rem;background:#f8f9fa;">
+                            <h4>${banner.title}</h4>
+                            <img src="${banner.image}" style="max-width:100%;height:auto;margin:10px 0;">
+                            <p><strong>Link:</strong> <a href="${banner.link}" target="_blank">${banner.link}</a></p>
+                            <small>Created: ${new Date(banner.created).toLocaleString()}</small>
+                        </div>
+                    `;
+                } else {
+                    currentBanner.innerHTML = '<p style="color:#666;font-style:italic;">No banner ad currently set.</p>';
+                }
+            }
+            
+            displayCurrentBanner();
+        }
+    </script>
+</body>
+</html>

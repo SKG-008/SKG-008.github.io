@@ -23,6 +23,7 @@ function createStandardHeader(pageTitle = '') {
                 <a href="master.html" id="masterPageBtn" class="admin-link">Master</a>
                 <a href="admin.html" id="adminPageBtn" class="admin-link">Admin</a>
                 <a href="ad-admin.html" id="adAdminBtn" class="admin-link">Ads</a>
+                <a href="ad-banner-manager.html" id="bannerAdminBtn" class="admin-link">Banner</a>
                 <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
             
@@ -44,6 +45,7 @@ function createStandardHeader(pageTitle = '') {
                     <a href="master.html" id="mobileMasterPageBtn" class="mobile-nav-link">Master</a>
                     <a href="admin.html" id="mobileAdminPageBtn" class="mobile-nav-link">Admin</a>
                     <a href="ad-admin.html" id="mobileAdAdminBtn" class="mobile-nav-link">Ads</a>
+                    <a href="ad-banner-manager.html" id="mobileBannerAdminBtn" class="mobile-nav-link">Banner</a>
                     <button id="mobileLogoutBtn" class="mobile-logout-btn">Logout</button>
                 </div>
             </div>
@@ -58,8 +60,13 @@ function initializeHeader() {
         const pageTitle = headerContainer.getAttribute('data-title') || '';
         headerContainer.innerHTML = createStandardHeader(pageTitle);
         
-        // Initialize authentication after header is created
-        setTimeout(initializeAuth, 100);
+        // Initialize authentication and mobile menu after header is created
+        setTimeout(() => {
+            initializeAuth();
+            if (window.initializeMobileMenu) {
+                window.initializeMobileMenu();
+            }
+        }, 100);
     }
 }
 
@@ -90,6 +97,7 @@ function updateAuthUI(currentUser) {
     const masterPageBtn = document.getElementById('masterPageBtn');
     const adminPageBtn = document.getElementById('adminPageBtn');
     const adAdminBtn = document.getElementById('adAdminBtn');
+    const bannerAdminBtn = document.getElementById('bannerAdminBtn');
     const addListingLink = document.getElementById('addListingLink');
     const myListingsLink = document.getElementById('myListingsLink');
     const bookmarksLink = document.getElementById('bookmarksLink');
@@ -103,6 +111,7 @@ function updateAuthUI(currentUser) {
         if (masterPageBtn) masterPageBtn.style.display = isMaster ? 'inline-block' : 'none';
         if (adminPageBtn) adminPageBtn.style.display = isMaster ? 'inline-block' : 'none';
         if (adAdminBtn) adAdminBtn.style.display = isMaster ? 'inline-block' : 'none';
+        if (bannerAdminBtn) bannerAdminBtn.style.display = isMaster ? 'inline-block' : 'none';
         
         if (addListingLink) addListingLink.style.display = 'inline-block';
         if (myListingsLink) myListingsLink.style.display = 'inline-block';
@@ -114,6 +123,7 @@ function updateAuthUI(currentUser) {
         if (masterPageBtn) masterPageBtn.style.display = 'none';
         if (adminPageBtn) adminPageBtn.style.display = 'none';
         if (adAdminBtn) adAdminBtn.style.display = 'none';
+        if (bannerAdminBtn) bannerAdminBtn.style.display = 'none';
         if (addListingLink) addListingLink.style.display = 'none';
         if (myListingsLink) myListingsLink.style.display = 'none';
         if (bookmarksLink) bookmarksLink.style.display = 'none';

@@ -55,12 +55,10 @@ function initializeMobileMenu() {
             const mobileMasterBtn = document.getElementById('mobileMasterPageBtn');
             const mobileAdminBtn = document.getElementById('mobileAdminPageBtn');
             const mobileAdAdminBtn = document.getElementById('mobileAdAdminBtn');
-            const mobileBannerAdminBtn = document.getElementById('mobileBannerAdminBtn');
             
             if (mobileMasterBtn) mobileMasterBtn.style.display = isMaster ? 'block' : 'none';
             if (mobileAdminBtn) mobileAdminBtn.style.display = isMaster ? 'block' : 'none';
             if (mobileAdAdminBtn) mobileAdAdminBtn.style.display = isMaster ? 'block' : 'none';
-            if (mobileBannerAdminBtn) mobileBannerAdminBtn.style.display = isMaster ? 'block' : 'none';
             
             // Show user links
             const mobileAddListingLink = document.getElementById('mobileAddListingLink');

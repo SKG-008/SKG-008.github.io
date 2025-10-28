@@ -166,17 +166,15 @@ body {
 
 /* Mobile Dropdown */
 .mobile-dropdown {
-    display: none;
     background: var(--white);
     border-top: 1px solid var(--border);
-    padding: 1rem;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, padding 0.3s ease;
+    transition: max-height 0.3s ease;
+    padding: 0 1rem;
 }
 
 .mobile-dropdown.show {
-    display: block;
     max-height: 500px;
     padding: 1rem;
 }
@@ -564,16 +562,19 @@ form button {
 
 /* Google Ads Standard Banner Sizes - Fixed dimensions */
 .ad-container[data-position="header-banner"] {
-    width: 728px;
+    width: 100%;
+    max-width: 728px;
     height: 90px;
-    max-width: 100%;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ad-container[data-position="header-banner"] .ad-image {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: 90px;
+    object-fit: contain;
     object-position: center;
 }
 

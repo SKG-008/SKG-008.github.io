@@ -82,31 +82,56 @@ function initializeMobileMenu() {
         }
     }
     
-    // Mobile login form handler
-    const mobileLoginForm = document.getElementById('mobileLoginForm');
-    if (mobileLoginForm) {
-        mobileLoginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('mobileUsername').value.trim();
-            const password = document.getElementById('mobilePassword').value;
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
+    // Mobile login - initialize after delay
+    setTimeout(() => {
+        const mobileLoginForm = document.getElementById('mobileLoginForm');
+        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+        
+        if (mobileLoginForm) {
+            mobileLoginForm.addEventListener('submit', handleMobileLogin);
+        }
+        if (mobileLoginBtn) {
+            mobileLoginBtn.addEventListener('click', handleMobileLogin);
+        }
+    }, 500);
+    
+    function handleMobileLogin(e) {
+        e.preventDefault();
+        const username = document.getElementById('mobileUsername')?.value?.trim();
+        const password = document.getElementById('mobilePassword')?.value;
+        
+        if (!username || !password) {
+            alert('Please enter username and password');
+            return;
+        }
+        
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        
+        if (users[username] && users[username] === password) {
+            localStorage.setItem('loggedInUser', username);
+            sessionStorage.setItem('manualLogin', 'true');
             
-            if (users[username] && users[username] === password) {
-                localStorage.setItem('loggedInUser', username);
-                sessionStorage.setItem('manualLogin', 'true');
-                // Clear mobile form
-                document.getElementById('mobileUsername').value = '';
-                document.getElementById('mobilePassword').value = '';
-                syncMobileAuth();
-                // Also update desktop UI
-                if (window.updateAuthUI) window.updateAuthUI(username);
-                if (window.displayListings) window.displayListings();
-                if (mobileDropdown) mobileDropdown.classList.remove('show');
-                if (mobileMenuBtn) mobileMenuBtn.innerHTML = '☰';
-            } else {
-                alert('Invalid credentials');
-            }
-        });
+            // Clear form
+            const usernameField = document.getElementById('mobileUsername');
+            const passwordField = document.getElementById('mobilePassword');
+            if (usernameField) usernameField.value = '';
+            if (passwordField) passwordField.value = '';
+            
+            // Update UI
+            syncMobileAuth();
+            if (window.updateAuthUI) window.updateAuthUI(username);
+            if (window.displayListings) window.displayListings();
+            
+            // Close menu
+            const dropdown = document.getElementById('mobileDropdown');
+            const menuBtn = document.getElementById('mobileMenuBtn');
+            if (dropdown) dropdown.classList.remove('show');
+            if (menuBtn) menuBtn.innerHTML = '☰';
+            
+            alert('Login successful!');
+        } else {
+            alert('Invalid username or password');
+        }
     }
     
     // Mobile register handler

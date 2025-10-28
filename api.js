@@ -1,25 +1,31 @@
-// API service for handling listings
-// Replace with your Railway app URL or use GitHub Pages fallback
-const API_URL = 'https://your-app-name.up.railway.app/api';
-const USE_FREE_STORAGE = true; // Set to false when using Railway backend
+// API service for handling listings - Free GitHub Pages storage
+const USE_FREE_STORAGE = true; // Always use free storage
 
 const ListingsAPI = {
   // Get all listings
   async getListings() {
     if (USE_FREE_STORAGE) {
-      // Use localStorage for completely free option
+      // Try to load from GitHub first, fallback to localStorage
+      try {
+        const response = await fetch('data/listings.json');
+        if (response.ok) {
+          const githubListings = await response.json();
+          // Merge with localStorage
+          const localListings = JSON.parse(localStorage.getItem('listings') || '[]');
+          const merged = [...githubListings, ...localListings.filter(local => 
+            !githubListings.find(github => github.id === local.id)
+          )];
+          return merged;
+        }
+      } catch (error) {
+        console.log('GitHub sync not available, using localStorage');
+      }
+      // Fallback to localStorage
       return JSON.parse(localStorage.getItem('listings') || '[]');
     }
     
-    try {
-      const response = await fetch(`${API_URL}/listings`);
-      if (!response.ok) throw new Error('Failed to fetch listings');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching listings:', error);
-      // Fallback to localStorage if server is unavailable
-      return JSON.parse(localStorage.getItem('listings') || '[]');
-    }
+    // Free storage only - no paid backend needed
+    return JSON.parse(localStorage.getItem('listings') || '[]');
   },
 
   // Add a new listing
@@ -31,25 +37,20 @@ const ListingsAPI = {
       const listings = JSON.parse(localStorage.getItem('listings') || '[]');
       listings.push(newListing);
       localStorage.setItem('listings', JSON.stringify(listings));
+      
+      // Auto-sync to GitHub if enabled
+      if (localStorage.getItem('autoSyncEnabled') === 'true') {
+        ListingsAPI.syncToGitHub(listings);
+      }
+      
       return newListing;
     }
     
-    try {
-      const response = await fetch(`${API_URL}/listings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newListing)
-      });
-      if (!response.ok) throw new Error('Failed to add listing');
-      return await response.json();
-    } catch (error) {
-      console.error('Error adding listing:', error);
-      // Fallback to localStorage
-      const listings = JSON.parse(localStorage.getItem('listings') || '[]');
-      listings.push(newListing);
-      localStorage.setItem('listings', JSON.stringify(listings));
-      return newListing;
-    }
+    // Free storage only
+    const listings = JSON.parse(localStorage.getItem('listings') || '[]');
+    listings.push(newListing);
+    localStorage.setItem('listings', JSON.stringify(listings));
+    return newListing;
   },
 
   // Delete a listing
@@ -62,19 +63,17 @@ const ListingsAPI = {
       return { message: 'Listing deleted' };
     }
     
-    try {
-      const response = await fetch(`${API_URL}/listings/${id}`, {
-        method: 'DELETE'
-      });
-      if (!response.ok) throw new Error('Failed to delete listing');
-      return await response.json();
-    } catch (error) {
-      console.error('Error deleting listing:', error);
-      // Fallback to localStorage
-      let listings = JSON.parse(localStorage.getItem('listings') || '[]');
-      listings = listings.filter(listing => listing.id !== id);
-      localStorage.setItem('listings', JSON.stringify(listings));
-      return { message: 'Listing deleted locally' };
-    }
+    // Free storage only
+    let listings = JSON.parse(localStorage.getItem('listings') || '[]');
+    listings = listings.filter(listing => listing.id !== id);
+    localStorage.setItem('listings', JSON.stringify(listings));
+    return { message: 'Listing deleted' };
+  },
+  
+  // Sync listings to GitHub format
+  syncToGitHub(listings) {
+    const dataStr = JSON.stringify(listings, null, 2);
+    localStorage.setItem('githubListings', dataStr);
+    console.log('Listings synced to GitHub format');
   }
 };

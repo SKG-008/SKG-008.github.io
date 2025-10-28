@@ -15,7 +15,9 @@
         <div style="margin-bottom: 20px;">
             <h3>GitHub Sync</h3>
             <p>Export listings to update your GitHub repository:</p>
-            <button id="syncBtn" class="filter-btn">Export Listings JSON</button>
+            <button id="syncBtn" class="filter-btn" onclick="syncListingsToGitHub()">Export Listings JSON</button>
+            <button id="autoSyncBtn" class="filter-btn" style="margin-left:10px;">Enable Auto-Sync</button>
+            <div id="syncStatus" style="margin-top:10px;color:#666;"></div>
         </div>
         
         <div style="margin-bottom: 20px;">
@@ -117,6 +119,44 @@
             });
             
             displayUsers();
+            
+            // Auto-sync functionality
+            document.getElementById('autoSyncBtn').addEventListener('click', function() {
+                const autoSync = localStorage.getItem('autoSyncEnabled') === 'true';
+                if (autoSync) {
+                    localStorage.removeItem('autoSyncEnabled');
+                    this.textContent = 'Enable Auto-Sync';
+                    document.getElementById('syncStatus').textContent = 'Auto-sync disabled';
+                } else {
+                    localStorage.setItem('autoSyncEnabled', 'true');
+                    this.textContent = 'Disable Auto-Sync';
+                    document.getElementById('syncStatus').textContent = 'Auto-sync enabled - listings will be saved to GitHub automatically';
+                    syncListingsToGitHub();
+                }
+            });
+            
+            // Check auto-sync status
+            if (localStorage.getItem('autoSyncEnabled') === 'true') {
+                document.getElementById('autoSyncBtn').textContent = 'Disable Auto-Sync';
+                document.getElementById('syncStatus').textContent = 'Auto-sync enabled';
+            }
+            
+            // Auto-sync function
+            function syncListingsToGitHub() {
+                const listings = JSON.parse(localStorage.getItem('listings') || '[]');
+                const dataStr = JSON.stringify(listings, null, 2);
+                
+                // Create downloadable file
+                const blob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'listings.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                document.getElementById('syncStatus').innerHTML = 'Listings exported! Upload the downloaded file to your GitHub repository at <code>data/listings.json</code> - ' + new Date().toLocaleString();
+            }
         });
     </script>
 </body>

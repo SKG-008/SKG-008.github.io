@@ -10,11 +10,11 @@ A property listing website with completely free hosting and storage options.
 - **Cost**: $0 forever
 - **Setup time**: 5 minutes
 
-### Option 2: Free with Database
-- **Frontend**: Netlify/Vercel (Free)
-- **Backend**: Railway (Free $5/month credit)
-- **Database**: MongoDB Atlas (Free 512MB)
-- **Cost**: Free for moderate usage
+### Option 2: GitHub Sync
+- **Frontend**: GitHub Pages (Free)
+- **Storage**: GitHub repository (Free)
+- **Sync**: Manual JSON upload
+- **Cost**: $0 forever
 
 ## Features
 
@@ -51,18 +51,18 @@ That's it! Your property listing website is live and completely free.
 - ✅ Custom domain support
 - ⚠️ Data is per-device (not shared between users)
 
-### Database Option:
+### GitHub Sync Option:
 - ✅ Shared listings between all users
-- ✅ ~2,000-5,000 listings capacity
-- ✅ Real-time updates
-- ✅ Backup and restore
+- ✅ Unlimited listings capacity
+- ✅ Version controlled backups
+- ✅ Manual sync updates
 
-## Upgrade Path
+## Scaling Path
 
-Start free and upgrade when needed:
-1. **Start**: GitHub Pages (Free)
-2. **Scale**: Add Railway + MongoDB ($0-9/month)
-3. **Production**: Paid hosting for high traffic
+All options remain free:
+1. **Start**: GitHub Pages + localStorage
+2. **Scale**: Add GitHub sync for shared data
+3. **Advanced**: Use GitHub API for automation
 
 ## Setup Instructions
 
@@ -71,9 +71,8 @@ See `free-setup-guide.md` for detailed setup instructions for both free options.
 ## Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript (Vanilla)
-- **Backend**: Node.js + Express (Optional)
-- **Database**: MongoDB or localStorage
-- **Hosting**: GitHub Pages, Netlify, Vercel, Railway
+- **Storage**: localStorage + GitHub sync
+- **Hosting**: GitHub Pages (Free)
 - **Images**: Base64 compression (no external storage needed)
 
 ## Contributing

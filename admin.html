@@ -30,6 +30,11 @@
             </form>
         </div>
         
+        <div style="margin-bottom: 20px;">
+            <h3>User Management</h3>
+            <div id="usersList"></div>
+        </div>
+        
         <div>
             <h3>Instructions</h3>
             <ol>
@@ -47,9 +52,17 @@
     <script src="mobile-menu.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is MasterLogin
+            const currentUser = localStorage.getItem('loggedInUser');
+            if (currentUser !== 'MasterLogin') {
+                document.querySelector('.container').innerHTML = '<h2>Access Denied</h2><p>Master login required.</p><a href="index.html">← Back to Home</a>';
+                return;
+            }
+            
             const configForm = document.getElementById('githubConfigForm');
             const repoInput = document.getElementById('repoName');
             const branchInput = document.getElementById('branchName');
+            const usersList = document.getElementById('usersList');
             
             // Load saved config
             const savedRepo = localStorage.getItem('githubRepo');
@@ -57,6 +70,35 @@
             
             if (savedRepo) repoInput.value = savedRepo;
             if (savedBranch) branchInput.value = savedBranch;
+            
+            // Display all users
+            function displayUsers() {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                usersList.innerHTML = '';
+                
+                Object.entries(users).forEach(([username, password]) => {
+                    const userDiv = document.createElement('div');
+                    userDiv.style.cssText = 'background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;';
+                    userDiv.innerHTML = `
+                        <div>
+                            <strong>Username:</strong> ${username}<br>
+                            <strong>Password:</strong> ${password}
+                        </div>
+                        ${username !== 'MasterLogin' ? `<button onclick="deleteUser('${username}')" style="background:#dc3545;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">Delete</button>` : ''}
+                    `;
+                    usersList.appendChild(userDiv);
+                });
+            }
+            
+            // Delete user function
+            window.deleteUser = function(username) {
+                if (confirm(`Delete user ${username}?`)) {
+                    const users = JSON.parse(localStorage.getItem('users') || '{}');
+                    delete users[username];
+                    localStorage.setItem('users', JSON.stringify(users));
+                    displayUsers();
+                }
+            };
             
             configForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -72,6 +114,8 @@
                     alert('Please enter both repository and branch name.');
                 }
             });
+            
+            displayUsers();
         });
     </script>
 </body>

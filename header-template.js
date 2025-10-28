@@ -67,6 +67,9 @@ function initializeHeader() {
         setTimeout(() => {
             initializeAuth();
             initializeMobileMenuDirect();
+            // Ensure mobile auth is synced
+            const currentUser = localStorage.getItem('loggedInUser');
+            updateMobileAuthUI(currentUser);
         }, 100);
     }
 }
@@ -80,10 +83,7 @@ function initializeAuth() {
         localStorage.setItem('users', JSON.stringify(users));
     }
     
-    // Clear any auto-login
-    if (!sessionStorage.getItem('manualLogin')) {
-        localStorage.removeItem('loggedInUser');
-    }
+    // Don't clear login - keep user logged in
     
     const currentUser = localStorage.getItem('loggedInUser');
     updateAuthUI(currentUser);
@@ -150,6 +150,7 @@ function setupAuthListeners() {
                 localStorage.setItem('loggedInUser', username);
                 sessionStorage.setItem('manualLogin', 'true');
                 updateAuthUI(username);
+                if (window.updateMobileAuthUI) window.updateMobileAuthUI(username);
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
                 if (window.displayListings) window.displayListings();
@@ -187,6 +188,7 @@ function setupAuthListeners() {
             localStorage.removeItem('loggedInUser');
             sessionStorage.removeItem('manualLogin');
             updateAuthUI(null);
+            if (window.updateMobileAuthUI) window.updateMobileAuthUI(null);
             // Clear form fields
             const usernameField = document.getElementById('username');
             const passwordField = document.getElementById('password');
@@ -287,8 +289,9 @@ function initializeMobileMenuDirect() {
                     });
                 }
                 
-                // Update desktop UI
+                // Update both desktop and mobile UI
                 if (window.updateAuthUI) window.updateAuthUI(username);
+                if (window.updateMobileAuthUI) window.updateMobileAuthUI(username);
                 if (window.displayListings) window.displayListings();
                 
                 alert('Login successful!');
@@ -297,8 +300,113 @@ function initializeMobileMenuDirect() {
             }
         };
     }
+    
+    // Mobile register handler
+    const mobileRegisterBtn = document.getElementById('mobileRegisterBtn');
+    if (mobileRegisterBtn) {
+        mobileRegisterBtn.onclick = function(e) {
+            e.preventDefault();
+            const username = document.getElementById('mobileUsername')?.value?.trim();
+            const password = document.getElementById('mobilePassword')?.value;
+            
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[username]) {
+                alert('Username already taken');
+                return;
+            }
+            
+            users[username] = password;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Clear form
+            document.getElementById('mobileUsername').value = '';
+            document.getElementById('mobilePassword').value = '';
+            
+            alert('Account created! You can now log in.');
+        };
+    }
+    
+    // Mobile logout handler
+    const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.onclick = function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            sessionStorage.removeItem('manualLogin');
+            
+            // Update mobile UI immediately
+            const mobileDisplayUser = document.getElementById('mobileDisplayUser');
+            const mobileLoginForm = document.getElementById('mobileLoginForm');
+            const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+            
+            if (mobileDisplayUser) mobileDisplayUser.textContent = '';
+            if (mobileLoginForm) mobileLoginForm.style.display = 'flex';
+            if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
+            
+            // Hide user links
+            const userLinks = ['mobileAddListingLink', 'mobileMyListingsLink', 'mobileBookmarksLink', 'mobileMasterPageBtn', 'mobileAdminPageBtn', 'mobileAdAdminBtn'];
+            userLinks.forEach(id => {
+                const link = document.getElementById(id);
+                if (link) link.style.display = 'none';
+            });
+            
+            // Update both desktop and mobile UI
+            if (window.updateAuthUI) window.updateAuthUI(null);
+            if (window.updateMobileAuthUI) window.updateMobileAuthUI(null);
+            if (window.displayListings) window.displayListings();
+            
+            alert('Logged out successfully');
+        };
+    }
+}
+
+// Update mobile auth UI
+function updateMobileAuthUI(currentUser) {
+    const mobileDisplayUser = document.getElementById('mobileDisplayUser');
+    const mobileLoginForm = document.getElementById('mobileLoginForm');
+    const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+    
+    if (currentUser) {
+        if (mobileDisplayUser) mobileDisplayUser.textContent = currentUser;
+        if (mobileLoginForm) mobileLoginForm.style.display = 'none';
+        if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'block';
+        
+        // Show user links
+        const userLinks = ['mobileAddListingLink', 'mobileMyListingsLink', 'mobileBookmarksLink'];
+        userLinks.forEach(id => {
+            const link = document.getElementById(id);
+            if (link) link.style.display = 'block';
+        });
+        
+        // Show admin links if master
+        if (currentUser === 'MasterLogin') {
+            const adminLinks = ['mobileMasterPageBtn', 'mobileAdminPageBtn', 'mobileAdAdminBtn'];
+            adminLinks.forEach(id => {
+                const link = document.getElementById(id);
+                if (link) link.style.display = 'block';
+            });
+        }
+    } else {
+        if (mobileDisplayUser) mobileDisplayUser.textContent = '';
+        if (mobileLoginForm) mobileLoginForm.style.display = 'flex';
+        if (mobileLogoutBtn) mobileLogoutBtn.style.display = 'none';
+        
+        // Hide all user links
+        const allLinks = ['mobileAddListingLink', 'mobileMyListingsLink', 'mobileBookmarksLink', 'mobileMasterPageBtn', 'mobileAdminPageBtn', 'mobileAdAdminBtn'];
+        allLinks.forEach(id => {
+            const link = document.getElementById(id);
+            if (link) link.style.display = 'none';
+        });
+    }
 }
 
 // Make functions globally available
 window.updateAuthUI = updateAuthUI;
+window.updateMobileAuthUI = updateMobileAuthUI;
 window.initializeHeader = initializeHeader;

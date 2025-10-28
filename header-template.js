@@ -9,21 +9,25 @@ function createStandardHeader(pageTitle = '') {
             </div>
             
             <div class="desktop-nav">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="listing.html" id="addListingLink" class="nav-link">Add Listing</a>
-                <a href="mylistings.html" id="myListingsLink" class="nav-link">My Listings</a>
-                <a href="bookmarks.html" id="bookmarksLink" class="nav-link">Bookmarks</a>
-                <a href="master.html" id="masterPageBtn" class="admin-link">Master</a>
-                <a href="admin.html" id="adminPageBtn" class="admin-link">Admin</a>
-                <a href="ad-admin.html" id="adAdminBtn" class="admin-link">Ads</a>
-                <form id="loginForm" class="fb-auth">
-                    <input type="text" id="username" placeholder="Username" required />
-                    <input type="password" id="password" placeholder="Password" required />
-                    <button type="submit" id="loginBtn">Login</button>
-                    <button type="button" id="registerBtn">Register</button>
-                </form>
-                <span id="displayUser" class="fb-user"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="listing.html" id="addListingLink" class="nav-link">Add Listing</a>
+                    <a href="mylistings.html" id="myListingsLink" class="nav-link">My Listings</a>
+                    <a href="bookmarks.html" id="bookmarksLink" class="nav-link">Bookmarks</a>
+                    <a href="master.html" id="masterPageBtn" class="admin-link">Master</a>
+                    <a href="admin.html" id="adminPageBtn" class="admin-link">Admin</a>
+                    <a href="ad-admin.html" id="adAdminBtn" class="admin-link">Ads</a>
+                </div>
+                <div class="auth-section">
+                    <form id="loginForm" class="fb-auth">
+                        <input type="text" id="username" placeholder="Username" required />
+                        <input type="password" id="password" placeholder="Password" required />
+                        <button type="submit" id="loginBtn">Login</button>
+                        <button type="button" id="registerBtn">Register</button>
+                    </form>
+                    <span id="displayUser" class="fb-user"></span>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
             </div>
             
             <div id="mobileDropdown" class="mobile-dropdown">

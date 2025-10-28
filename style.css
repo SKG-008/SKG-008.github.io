@@ -41,7 +41,7 @@ body {
 
 /* Body padding to account for fixed header */
 body {
-    padding-top: 64px;
+    padding-top: 120px;
 }
 
 .fb-header-content {
@@ -77,6 +77,21 @@ body {
     display: flex;
     align-items: center;
     gap: 2rem;
+    margin-left: auto;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-left: auto;
 }
 

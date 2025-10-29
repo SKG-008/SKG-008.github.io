@@ -252,18 +252,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             html += `<div class="listing-details">`;
-            // Suburb and Type
-            html += `<div class="listing-type">${listing.type || "Property"}${listing.suburb ? " - " + listing.suburb : ""}</div>`;
-            // Address
-            html += `<div class="listing-title">${listing.address || ""}</div>`;
-            // Price
+            // Price (top priority)
             if (mode === "rent") {
-                html += `<div class="listing-price">$${Number(listing.value).toLocaleString()} / week</div>`;
+                html += `<div class="listing-price">$${Number(listing.value).toLocaleString()} per week</div>`;
             } else {
                 html += `<div class="listing-price">$${Number(listing.value).toLocaleString()}</div>`;
             }
-            // Meta
-            html += `<div class="listing-meta">Bedrooms: ${listing.bedrooms || "-"} | Bathrooms: ${listing.bathrooms || "-"}</div>`;
+            // Type and Suburb
+            html += `<div class="listing-type">${listing.type || "Property"}</div>`;
+            // Address
+            html += `<div class="listing-title">${listing.address || ""}${listing.suburb ? ", " + listing.suburb : ""}</div>`;
+            // Meta with icons
+            html += `<div class="listing-meta">`;
+            if (listing.bedrooms) html += `<span>🛏️ ${listing.bedrooms}</span>`;
+            if (listing.bathrooms) html += `<span>🚿 ${listing.bathrooms}</span>`;
+            if (listing.carPark) html += `<span>🚗 ${listing.carPark}</span>`;
+            html += `</div>`;
             // Description (show only first 3 lines)
             const previewDescription = getFirstNLines(listing.description, 3);
             html += `<div class="listing-description">${previewDescription}</div>`;

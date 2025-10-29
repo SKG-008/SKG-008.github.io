@@ -180,6 +180,12 @@ function setupAuthListeners() {
             
             users[username] = password;
             localStorage.setItem('users', JSON.stringify(users));
+            
+            // Auto-sync users to GitHub
+            if (window.GitHubSync) {
+                GitHubSync.syncUsers(users);
+            }
+            
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             alert('Registered! Now log in.');
@@ -326,6 +332,11 @@ function initializeMobileMenuDirect() {
             
             users[username] = password;
             localStorage.setItem('users', JSON.stringify(users));
+            
+            // Auto-sync users to GitHub
+            if (window.GitHubSync) {
+                GitHubSync.syncUsers(users);
+            }
             
             // Clear form
             document.getElementById('mobileUsername').value = '';

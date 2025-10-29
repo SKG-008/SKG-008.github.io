@@ -21,16 +21,17 @@
         </div>
         
         <div style="margin-bottom: 20px;">
-            <h3>GitHub Configuration</h3>
+            <h3>GitHub Auto-Sync Setup</h3>
             <form id="githubConfigForm">
+                <label for="githubToken">GitHub Personal Access Token:</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+                
                 <label for="repoName">GitHub Repository (username/repo):</label>
                 <input type="text" id="repoName" placeholder="e.g., yourusername/your-repo">
                 
-                <label for="branchName">Branch Name:</label>
-                <input type="text" id="branchName" placeholder="e.g., main">
-                
-                <button type="submit" class="filter-btn">Save Configuration</button>
+                <button type="submit" class="filter-btn">Enable Auto-Sync</button>
             </form>
+            <small style="color:#666;">Get token from GitHub Settings → Developer settings → Personal access tokens</small>
         </div>
         
         <div style="margin-bottom: 20px;">
@@ -50,6 +51,7 @@
     </div>
     
     <script src="api.js"></script>
+    <script src="github-auto-sync.js"></script>
     <script src="sync.js"></script>
     <script src="header-template.js"></script>
     <script src="mobile-menu.js"></script>
@@ -63,16 +65,16 @@
             }
             
             const configForm = document.getElementById('githubConfigForm');
+            const tokenInput = document.getElementById('githubToken');
             const repoInput = document.getElementById('repoName');
-            const branchInput = document.getElementById('branchName');
             const usersList = document.getElementById('usersList');
             
             // Load saved config
             const savedRepo = localStorage.getItem('githubRepo');
-            const savedBranch = localStorage.getItem('githubBranch');
+            const savedToken = localStorage.getItem('githubToken');
             
             if (savedRepo) repoInput.value = savedRepo;
-            if (savedBranch) branchInput.value = savedBranch;
+            if (savedToken) tokenInput.value = savedToken;
             
             // Export users to GitHub
             function exportUsers() {
@@ -124,15 +126,16 @@
             configForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
+                const token = tokenInput.value.trim();
                 const repo = repoInput.value.trim();
-                const branch = branchInput.value.trim();
                 
-                if (repo && branch) {
-                    localStorage.setItem('githubRepo', repo);
-                    localStorage.setItem('githubBranch', branch);
-                    alert('GitHub configuration saved!');
+                if (token && repo) {
+                    if (window.GitHubSync) {
+                        GitHubSync.setCredentials(token, repo);
+                        alert('Auto-sync enabled! All changes will now sync automatically to GitHub.');
+                    }
                 } else {
-                    alert('Please enter both repository and branch name.');
+                    alert('Please enter both GitHub token and repository.');
                 }
             });
             

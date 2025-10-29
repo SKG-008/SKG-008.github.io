@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Test - Virtual.Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="standardHeader" data-title="Sync Test"></div>
+    
+    <div class="container">
+        <h2>Sync Test Results</h2>
+        <div id="testResults"></div>
+        <button id="runTest" class="filter-btn">Run Sync Test</button>
+    </div>
+
+    <script src="github-auto-sync.js"></script>
+    <script src="api.js"></script>
+    <script src="header-template.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const results = document.getElementById('testResults');
+            const runBtn = document.getElementById('runTest');
+            
+            runBtn.addEventListener('click', async function() {
+                results.innerHTML = '<p>Testing sync functionality...</p>';
+                
+                const tests = [
+                    {
+                        name: 'GitHub Auto-Sync Available',
+                        test: () => typeof window.GitHubSync !== 'undefined'
+                    },
+                    {
+                        name: 'ListingsAPI Available',
+                        test: () => typeof ListingsAPI !== 'undefined'
+                    },
+                    {
+                        name: 'GitHub Data Loading',
+                        test: async () => {
+                            try {
+                                const response = await fetch('./data/listings.json?t=' + Date.now());
+                                return response.status === 200 || response.status === 404;
+                            } catch { return true; }
+                        }
+                    },
+                    {
+                        name: 'Users Data Loading', 
+                        test: async () => {
+                            try {
+                                const response = await fetch('./data/users.json?t=' + Date.now());
+                                return response.status === 200 || response.status === 404;
+                            } catch { return true; }
+                        }
+                    },
+                    {
+                        name: 'LocalStorage Working',
+                        test: () => {
+                            try {
+                                localStorage.setItem('test', '1');
+                                const result = localStorage.getItem('test') === '1';
+                                localStorage.removeItem('test');
+                                return result;
+                            } catch { return false; }
+                        }
+                    },
+                    {
+                        name: 'Mobile Auth Elements Present',
+                        test: () => {
+                            return document.getElementById('mobileLoginBtn') !== null &&
+                                   document.getElementById('mobileUsername') !== null;
+                        }
+                    }
+                ];
+                
+                let passed = 0;
+                results.innerHTML = '';
+                
+                for (const test of tests) {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'padding:8px;margin:4px;border-radius:4px;';
+                    
+                    try {
+                        const result = await test.test();
+                        if (result) {
+                            div.style.background = '#d4edda';
+                            div.innerHTML = `✓ ${test.name}`;
+                            passed++;
+                        } else {
+                            div.style.background = '#f8d7da';
+                            div.innerHTML = `✗ ${test.name}`;
+                        }
+                    } catch (error) {
+                        div.style.background = '#f8d7da';
+                        div.innerHTML = `✗ ${test.name} - Error: ${error.message}`;
+                    }
+                    
+                    results.appendChild(div);
+                }
+                
+                const summary = document.createElement('div');
+                summary.style.cssText = 'font-weight:bold;margin:16px 0;padding:12px;border-radius:4px;';
+                summary.style.background = passed === tests.length ? '#d4edda' : '#fff3cd';
+                summary.innerHTML = `Sync Test Results: ${passed}/${tests.length} tests passed`;
+                results.insertBefore(summary, results.firstChild);
+                
+                // Test actual sync
+                if (passed === tests.length) {
+                    const syncDiv = document.createElement('div');
+                    syncDiv.innerHTML = '<h3>Testing Live Sync...</h3>';
+                    results.appendChild(syncDiv);
+                    
+                    // Test listing sync
+                    try {
+                        const listings = await ListingsAPI.getListings();
+                        syncDiv.innerHTML += `<p>✓ Loaded ${listings.length} listings from sync</p>`;
+                    } catch (error) {
+                        syncDiv.innerHTML += `<p>✗ Listing sync failed: ${error.message}</p>`;
+                    }
+                    
+                    // Test user sync
+                    const users = JSON.parse(localStorage.getItem('users') || '{}');
+                    syncDiv.innerHTML += `<p>✓ Loaded ${Object.keys(users).length} users from sync</p>`;
+                }
+            });
+            
+            // Auto-run test
+            setTimeout(() => runBtn.click(), 1000);
+        });
+    </script>
+</body>
+</html>

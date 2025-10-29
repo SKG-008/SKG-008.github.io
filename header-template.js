@@ -70,6 +70,10 @@ function initializeHeader() {
             // Ensure mobile auth is synced
             const currentUser = localStorage.getItem('loggedInUser');
             updateMobileAuthUI(currentUser);
+            // Refresh data from GitHub
+            if (window.displayListings) {
+                setTimeout(() => window.displayListings(), 500);
+            }
         }, 100);
     }
 }
@@ -423,22 +427,21 @@ function updateMobileAuthUI(currentUser) {
 // Load users from GitHub
 async function loadUsersFromGitHub() {
     try {
-        const response = await fetch('data/users.json');
+        const response = await fetch('data/users.json?t=' + Date.now());
         if (response.ok) {
             const githubUsers = await response.json();
-            // Merge with local users
-            const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-            const mergedUsers = {...githubUsers, ...localUsers};
-            localStorage.setItem('users', JSON.stringify(mergedUsers));
+            // Always use GitHub as source of truth
+            localStorage.setItem('users', JSON.stringify(githubUsers));
             localStorage.setItem('githubUsers', JSON.stringify(githubUsers));
+            console.log('Users synced from GitHub');
         }
     } catch (error) {
         console.log('GitHub users sync not available');
         // Use cached GitHub users if available
         const cachedUsers = JSON.parse(localStorage.getItem('githubUsers') || '{}');
-        const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-        const mergedUsers = {...cachedUsers, ...localUsers};
-        localStorage.setItem('users', JSON.stringify(mergedUsers));
+        if (Object.keys(cachedUsers).length > 0) {
+            localStorage.setItem('users', JSON.stringify(cachedUsers));
+        }
     }
 }
 

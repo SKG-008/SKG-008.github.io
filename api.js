@@ -5,18 +5,19 @@ const ListingsAPI = {
   // Get all listings
   async getListings() {
     if (USE_FREE_STORAGE) {
-      // Try to load from GitHub first, fallback to localStorage
+      // Try to load from GitHub first with cache busting
       try {
-        const response = await fetch('data/listings.json');
+        const response = await fetch('data/listings.json?t=' + Date.now());
         if (response.ok) {
           const githubListings = await response.json();
           // Store GitHub listings locally for offline access
           localStorage.setItem('githubListings', JSON.stringify(githubListings));
-          // Merge with localStorage
+          // Merge with localStorage (local additions)
           const localListings = JSON.parse(localStorage.getItem('listings') || '[]');
           const merged = [...githubListings, ...localListings.filter(local => 
             !githubListings.find(github => github.id === local.id)
           )];
+          console.log('Listings synced from GitHub');
           return merged;
         }
       } catch (error) {
@@ -69,6 +70,12 @@ const ListingsAPI = {
       let listings = JSON.parse(localStorage.getItem('listings') || '[]');
       listings = listings.filter(listing => listing.id !== id);
       localStorage.setItem('listings', JSON.stringify(listings));
+      
+      // Auto-sync to GitHub API
+      if (window.GitHubSync) {
+        GitHubSync.syncListings(listings);
+      }
+      
       return { message: 'Listing deleted' };
     }
     
@@ -119,3 +126,6 @@ const ListingsAPI = {
     console.log('Users auto-exported for GitHub upload');
   }
 };
+
+// Make ListingsAPI globally available
+window.ListingsAPI = ListingsAPI;

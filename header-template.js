@@ -185,9 +185,9 @@ function setupAuthListeners() {
             users[username] = password;
             localStorage.setItem('users', JSON.stringify(users));
             
-            // Auto-sync users to GitHub
-            if (window.GitHubSync) {
-                GitHubSync.syncUsers(users);
+            // Universal sync - no setup required
+            if (window.UniversalSync) {
+                UniversalSync.syncUsers(users);
             }
             
             document.getElementById('username').value = '';
@@ -337,9 +337,9 @@ function initializeMobileMenuDirect() {
             users[username] = password;
             localStorage.setItem('users', JSON.stringify(users));
             
-            // Auto-sync users to GitHub
-            if (window.GitHubSync) {
-                GitHubSync.syncUsers(users);
+            // Universal sync - no setup required
+            if (window.UniversalSync) {
+                UniversalSync.syncUsers(users);
             }
             
             // Clear form

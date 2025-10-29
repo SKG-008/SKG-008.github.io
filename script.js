@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateUI() {
-        currentUser = localStorage.getItem("loggedInUser");
+        currentUser = sessionStorage.getItem("loggedInUser");
         if (window.updateAuthUI) {
             window.updateAuthUI(currentUser);
         }
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.toggleBookmark = function (listingId, btn) {
-        const user = localStorage.getItem("loggedInUser");
+        const user = sessionStorage.getItem("loggedInUser");
         if (!user) {
             alert("Please log in to bookmark listings.");
             const usernameInput = document.getElementById('username');
